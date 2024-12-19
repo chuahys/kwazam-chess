@@ -21,7 +21,7 @@ public class ChessGameGUI extends JFrame {
     };
 
     public ChessGameGUI() {
-        setTitle("KwaZam Chess Game");
+        setTitle("Kwazam Chess Game");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLayout(new GridLayout(8, 5));
         initializeBoard();
