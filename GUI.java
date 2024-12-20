@@ -1,13 +1,13 @@
 import java.awt.*;
 import java.util.List;
 import javax.swing.*;
+import javax.swing.border.EmptyBorder;
 
 public class GUI extends JFrame {
-    // private final Component[][] squares = new Component[8][5];
-    // private final Game game = new Game();
-
     private GameController controller;
     private Component[][] buttons;
+    private JLabel currentPlayerLabel;
+    private JLabel turnCountLabel;
 
     public GUI(GameController controller) {
         this.controller = controller;
@@ -17,26 +17,62 @@ public class GUI extends JFrame {
 
     private void initGUI() {
         setTitle("Kwazam Chess Game");
-        setSize(800, 500);
+        setSize(500, 800);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setLayout(new GridLayout(8, 5));
+        setLayout(new BorderLayout());
+
+        JPanel mainPanel = new JPanel(new BorderLayout());
+        mainPanel.setBorder(new EmptyBorder(10, 10, 10, 10));
+        
+        JPanel boardPanel = new JPanel(new GridLayout(8, 5));
+        JPanel rowPanel = new JPanel(new GridLayout(8, 1));
+        JPanel colPanel = new JPanel(new GridLayout(1, 5));
+        
+        rowPanel.setBorder(new EmptyBorder(0, 0, 0, 10));
+        colPanel.setBorder(new EmptyBorder(10, 0, 0, 0));
+
+        for (int row = 0; row < 8; row++) {
+            JLabel rowLabel = new JLabel(String.valueOf(row + 1), SwingConstants.CENTER);
+            rowPanel.add(rowLabel);
+        }
+
+        for (int col = 0; col < 5; col++) {
+            JLabel colLabel = new JLabel(String.valueOf(col + 1), SwingConstants.CENTER);
+            colPanel.add(colLabel);
+        }
 
         for (int row = 0; row < 8; row++) {
             for (int col = 0; col < 5; col++) {
                 final int r = row; // Capture row value
                 final int c = col; // Capture column value
                 Component button = new Component(row, col);
-                button.addActionListener(e -> controller.handleUserClick(r, c));
+                button.addActionListener(e -> controller.buttonClick(r, c));
                 buttons[row][col] = button;
-                add(button);
+                boardPanel.add(button);
             }
         }
 
-        addGameResetOption();
+        mainPanel.add(rowPanel, BorderLayout.WEST);
+        mainPanel.add(colPanel, BorderLayout.SOUTH);
+        mainPanel.add(boardPanel, BorderLayout.CENTER);
+
+        add(mainPanel, BorderLayout.CENTER);
+
+        // Status panel
+        JPanel statusPanel = new JPanel(new BorderLayout());
+        currentPlayerLabel = new JLabel();
+        turnCountLabel = new JLabel();
+
+        statusPanel.add(currentPlayerLabel, BorderLayout.WEST);
+        statusPanel.add(turnCountLabel, BorderLayout.EAST);
+
+        add(statusPanel, BorderLayout.NORTH);
+        
+        gameMenu();
         refreshBoard();
     }
 
-public void refreshBoard() {
+    public void refreshBoard() {
         Piece[][] board = controller.getGame().getBoard().getBoard();
         for (int row = 0; row < 8; row++) {
             for (int col = 0; col < 5; col++) {
@@ -50,16 +86,20 @@ public void refreshBoard() {
                 }
             }
         }
+
+        // Update status labels
+        currentPlayerLabel.setText("Current Player: " + (controller.getGame().getCurrentPlayerColor() == PieceColor.BLUE ? "Blue" : "Red"));
+        turnCountLabel.setText("Turn Count: " + controller.getGame().getMoveCount()/2);
     }
 
-    public void highlightLegalMoves(Position position) {
-        List<Position> legalMoves = controller.getGame().getLegalMovesForPieceAt(position);
-        for (Position move : legalMoves) {
+    public void highlightValidMove(Position position) {
+        List<Position> validMove = controller.getGame().getValidMoveAt(position);
+        for (Position move : validMove) {
             buttons[move.getRow()][move.getColumn()].setBackground(Color.GREEN);
         }
     }
 
-    public void clearHighlights() {
+    public void clearHighlight() {
         for (int row = 0; row < 8; row++) {
             for (int col = 0; col < 5; col++) {
                 buttons[row][col].setBackground(Color.LIGHT_GRAY);
@@ -67,132 +107,18 @@ public void refreshBoard() {
         }
     }
 
-    private void addGameResetOption() {
+    private void gameMenu() {
         JMenuBar menuBar = new JMenuBar();
-        JMenu gameMenu = new JMenu("Game");
-        JMenuItem resetItem = new JMenuItem("Reset");
+        JMenu gameMenu = new JMenu("Menu");
+
+        JMenuItem resetItem = new JMenuItem("Restart");
         resetItem.addActionListener(e -> {
             controller.getGame().resetGame();
             refreshBoard();
         });
+
         gameMenu.add(resetItem);
         menuBar.add(gameMenu);
         setJMenuBar(menuBar);
     }
 }
-
-    // public GUI() {
-    //     setTitle("Kwazam Chess Game");
-    //     setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-    //     setLayout(new GridLayout(8, 5));
-    //     initializeBoard();
-    //     addGameResetOption();
-    //     pack();
-    //     setVisible(true);
-    // }
-
-    // private void initializeBoard() {
-    //     for (int row = 0; row < squares.length; row++) {
-    //         for (int col = 0; col < squares[row].length; col++) {
-    //             final int finalRow = row;
-    //             final int finalCol = col;
-    //             Component button = new Component(row, col);
-    //             button.setBackground(Color.GRAY); // Uniform background color
-    //             button.addMouseListener(new MouseAdapter() {
-    //                 @Override
-    //                 public void mouseClicked(MouseEvent e) {
-    //                     handleSquareClick(finalRow, finalCol);
-    //                 }
-    //             });
-    //             add(button);
-    //             squares[row][col] = button;
-    //         }
-    //     }
-    //     refreshBoard();
-    // }
-
-    // private void refreshBoard() {
-    //     Board board = game.getBoard();
-    //     for (int row = 0; row < 8; row++) {
-    //         for (int col = 0; col < 5; col++) {
-    //             Piece piece = board.getPiece(row, col);
-    //             if (piece != null) {
-    //                 // If using Unicode symbols:
-    //                 String symbol = pieceUnicodeMap.get(piece.getClass());
-    //                 Color color = (piece.getColor() == PieceColor.BLUE) ? Color.WHITE : Color.BLACK;
-    //                 squares[row][col].setPieceSymbol(symbol, color);
-    //             } else {
-    //                 squares[row][col].clearPieceSymbol();
-    //             }
-    //         }
-    //     }
-    // }
-
-    // private void handleSquareClick(int row, int col) {
-    //     boolean moveResult = game.handleSquareSelection(row, col);
-    //     clearHighlights();
-    //     if (moveResult) {
-    //         refreshBoard();
-    //         checkGameState();
-    //         checkGameOver();
-    //     } else if (game.isPieceSelected()) {
-    //         highlightLegalMoves(new Position(row, col));
-    //     }
-    //     refreshBoard();
-    // }
-
-    // private void checkGameState() {
-    //     PieceColor currentPlayer = game.getCurrentPlayerColor();
-    //     boolean inCheck = game.isInCheck(currentPlayer);
-
-    //     if (inCheck) {
-    //         JOptionPane.showMessageDialog(this, currentPlayer + " is in check!");
-    //     }
-    // }
-
-    // private void highlightLegalMoves(Position position) {
-    //     List<Position> legalMoves = game.getLegalMovesForPieceAt(position);
-    //     for (Position move : legalMoves) {
-    //         squares[move.getRow()][move.getColumn()].setBackground(Color.GREEN);
-    //     }
-    // }
-
-    // private void clearHighlights() {
-    //     for (int row = 0; row < 8; row++) {
-    //         for (int col = 0; col < 5; col++) {
-    //             squares[row][col].setBackground(Color.GRAY);
-    //         }
-    //     }
-    // }
-
-    // private void addGameResetOption() {
-    //     JMenuBar menuBar = new JMenuBar();
-    //     JMenu gameMenu = new JMenu("Game");
-    //     JMenuItem resetItem = new JMenuItem("Reset");
-    //     resetItem.addActionListener(e -> resetGame());
-    //     gameMenu.add(resetItem);
-    //     menuBar.add(gameMenu);
-    //     setJMenuBar(menuBar);
-    // }
-
-    // private void resetGame() {
-    //     game.resetGame();
-    //     refreshBoard();
-    // }
-
-    // private void checkGameOver() {
-    //     if (game.isCheckmate(game.getCurrentPlayerColor())) {
-    //         int response = JOptionPane.showConfirmDialog(this, "Checkmate! Would you like to play again?", "Game Over",
-    //                 JOptionPane.YES_NO_OPTION);
-    //         if (response == JOptionPane.YES_OPTION) {
-    //             resetGame();
-    //         } else {
-    //             System.exit(0);
-    //         }
-    //     }
-    // }
-
-    // public static void main(String[] args) {
-    //     SwingUtilities.invokeLater(GUI::new);
-    // }
-// }

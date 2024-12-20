@@ -6,6 +6,11 @@ public class Board {
         setupPieces();
     }
 
+    public void setBoard(Piece[][] newBoard) {
+        this.board = newBoard;
+
+    }
+
     public Piece[][] getBoard() {
         return board;
     }
@@ -57,5 +62,21 @@ public class Board {
             // Clear the start position
             board[start.getRow()][start.getColumn()] = null;
         }
+    }
+
+    public void flipBoard() {
+        Piece[][] newBoard = new Piece[8][5];
+        for (int row = 0; row < 8; row++) {
+            for (int col = 0; col < 5; col++) {
+                Piece piece = board[row][col];
+                if (piece != null) {
+                    int newRow = 7 - row;
+                    int newCol = 4 - col;
+                    piece.setPosition(new Position(newRow, newCol));
+                    newBoard[newRow][newCol] = piece;
+                }
+            }
+        }
+        board = newBoard;
     }
 }
