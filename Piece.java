@@ -1,29 +1,41 @@
-public abstract class Piece {
-    protected Position position;
-    protected PieceColor color;
+import java.util.List;
 
-    public Piece(PieceColor color, Position position) {
+public abstract class Piece {
+    private PieceColor color; // Color of the piece (RED or BLUE)
+    protected int row, col;   // Position of the piece on the board
+
+    public Piece(PieceColor color, int row, int col) {
         this.color = color;
-        this.position = position;
+        this.row = row;
+        this.col = col;
     }
 
     public PieceColor getColor() {
         return color;
     }
 
-    public Position getPosition() {
-        return position;
+    public int getRow() {
+        return row;
     }
 
-    public void setPosition(Position position) {
-        this.position = position;
+    public int getCol() {
+        return col;
     }
 
-    // Abstract method to be implemented by subclasses for movement validation
-    public abstract boolean isValidMove(Position newPosition, Piece[][] board);
-
-    // Abstract method for pieces that need transformation logic to implement it
-    public void transformIfNecessary() {
-        // Default implementation does nothing (only implemented in Tor/Xor)
+    public void setPosition(int row, int col) {
+        if (row < 0 || row >= 8 || col < 0 || col >= 5) {
+            throw new IllegalArgumentException("Invalid position on the board");
+        }
+        this.row = row;
+        this.col = col;
     }
+
+    // Abstract method to check if a move is valid for this piece
+    public abstract boolean isValidMove(Board board, int startRow, int startCol, int endRow, int endCol);
+
+    // Abstract method to get valid moves for a specific piece
+    public abstract List<int[]> getValidMoves(Board board);
+
+    // Optional transformation logic (e.g., piece promotion or upgrade)
+    public abstract void transform();
 }

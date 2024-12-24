@@ -1,48 +1,90 @@
+import java.util.*;
+
 public class Xor extends Piece {
-    private int turns;
+    private int moveCount; // Track the number of moves to handle transformation
 
-    public Xor(PieceColor color, Position position) {
-        super(color, position);
-        this.turns = 0; // Initialize turn counter
+    public Xor(PieceColor color, int row, int col) {
+        super(color, row, col);
+        this.moveCount = 0;
     }
 
     @Override
-    public boolean isValidMove(Position newPosition, Piece[][] board) {
-        // Xor can move diagonally
-        int rowDifference = Math.abs(position.getRow() - newPosition.getRow());
-        int colDifference = Math.abs(position.getColumn() - newPosition.getColumn());
+    public boolean isValidMove(Board board, int startRow, int startCol, int endRow, int endCol) {
+        // Must move diagonally (row and column must change by the same amount)
+        if (Math.abs(endRow - startRow) != Math.abs(endCol - startCol)) {
+            return false;
+        }
 
-        if (rowDifference == colDifference) {
-            int rowDirection = (newPosition.getRow() > position.getRow()) ? 1 : -1;
-            int colDirection = (newPosition.getColumn() > position.getColumn()) ? 1 : -1;
+        // Determine direction of movement (diagonal)
+        int rowDirection = Integer.compare(endRow, startRow);
+        int colDirection = Integer.compare(endCol, startCol);
 
-            int row = position.getRow() + rowDirection;
-            int col = position.getColumn() + colDirection;
+        // Check all squares in the path to ensure they are empty
+        int currentRow = startRow + rowDirection;
+        int currentCol = startCol + colDirection;
 
-            while (row != newPosition.getRow() && col != newPosition.getColumn()) {
-                if (board[row][col] != null) {
-                    return false; // There's a piece in the way
+        while (currentRow != endRow || currentCol != endCol) {
+            if (board.getPieceAt(currentRow, currentCol) != null) {
+                return false; // Path is blocked
+            }
+            currentRow += rowDirection;
+            currentCol += colDirection;
+        }
+
+        // Check if the target square is occupied by an ally
+        Piece targetPiece = board.getPieceAt(endRow, endCol);
+        return targetPiece == null || targetPiece.getColor() != getColor();
+    }
+
+    @Override
+    public List<int[]> getValidMoves(Board board) {
+        List<int[]> validMoves = new ArrayList<>();
+
+        // Check all 4 diagonal directions (top-left, top-right, bottom-left, bottom-right)
+        int[][] directions = {
+            {-1, -1}, {-1, 1}, // Top-left, top-right
+            {1, -1}, {1, 1}    // Bottom-left, bottom-right
+        };
+
+        for (int[] direction : directions) {
+            int newRow = getRow();
+            int newCol = getCol();
+
+            // Move in the current direction until the edge of the board or a block
+            while (true) {
+                newRow += direction[0];
+                newCol += direction[1];
+
+                // Stop if out of bounds
+                if (newRow < 0 || newRow >= 8 || newCol < 0 || newCol >= 5) {
+                    break;
                 }
-                row += rowDirection;
-                col += colDirection;
-            }
 
-            // Check the destination square for capturing
-            Piece destinationPiece = board[newPosition.getRow()][newPosition.getColumn()];
-            if (destinationPiece == null || destinationPiece.getColor() != this.getColor()) {
-                return true; // Valid move or capture
+                // Stop if the square is occupied by an ally
+                Piece piece = board.getPieceAt(newRow, newCol);
+                if (piece != null) {
+                    if (piece.getColor() == getColor()) {
+                        break;
+                    }
+                    // Add the move if the square is occupied by an opponent
+                    validMoves.add(new int[]{newRow, newCol});
+                    break;
+                }
+
+                // Add the move if the square is empty
+                validMoves.add(new int[]{newRow, newCol});
             }
         }
-        return false; // Invalid move (Xor can only move diagonally)
+
+        return validMoves;
     }
 
     @Override
-    public void transformIfNecessary() {
-        turns++;
-        if (turns == 2) {
-            // Transform to Tor
-            System.out.println("Xor transforms into Tor");
-            // In a real game, you'd update the board with a new Tor piece
-        }
+    public void transform() {
+        // Replace this piece with a Tor piece
+        Tor transformedPiece = new Tor(getColor(), getRow(), getCol());
+        Board board = Board.getInstance();
+        board.setPieceAt(getRow(), getCol(), transformedPiece);
+        System.out.println("Xor at (" + getRow() + ", " + getCol() + ") transformed into Tor.");
     }
 }

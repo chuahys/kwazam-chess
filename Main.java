@@ -1,10 +1,24 @@
-import javax.swing.SwingUtilities;
+import javax.swing.*;
 
 public class Main {
     public static void main(String[] args) {
-        SwingUtilities.invokeLater(() -> {
-            GameController controller = new GameController();
-            controller.start();
+        // Start the game on the Event Dispatch Thread for thread-safety with Swing
+        SwingUtilities.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                Game game = new Game();  // Initialize the game model
+                BoardView boardView = new BoardView(game);  // Pass the Game object to the view constructor
+                GameController controller = new GameController(game, boardView);  // Initialize the controller
+
+                // Set up JFrame
+                JFrame frame = new JFrame("Kwazam Chess Game");
+                frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+                frame.setSize(500, 800);  // Set window size (adjust as needed)
+                frame.setResizable(true);  // Enable resizing
+                frame.add(boardView);  // Add the game view to the JFrame
+                frame.setLocationRelativeTo(null);  // Center the window
+                frame.setVisible(true);  // Show the window
+            }
         });
     }
 }

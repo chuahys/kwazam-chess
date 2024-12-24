@@ -1,64 +1,66 @@
-/**
- * This class handles user interactions and updates the view.
- */
+import java.awt.event.*;
+import java.util.*;
+import javax.swing.*;
 
 public class GameController {
-    private Game game;
-    private GUI view;
+    private final Game game; // Model
+    private final BoardView boardView; // View
+    
+    private int selectedRow = -1; // Row of selected piece
+    private int selectedCol = -1; // Column of selected piece
 
-    /**
-     * Constructs a GameController with the specified game.
-     * 
-     * @param game the game to be controlled
-     */
-
-    public GameController() {
-        this.game = Game.getInstance();
-        this.view = new GUI(this);
-        //this.game.addObserver(view);
+    public GameController(Game game, BoardView boardView) {
+        this.game = game;
+        this.boardView = boardView;
+        addBoardListener();
     }
 
-    public Game getGame() {
-        return game;
-    }
-
-    public void buttonClick(int row, int col) {
-        boolean moveResult = game.handleButtonSelection(row, col);
-        view.clearHighlight();
-        if (moveResult) {
-            //game.nextTurn();
-            view.refreshBoard();
-            //checkGameState();
-            //checkGameOver();
-        } else if (game.isPieceSelected()) {
-            view.highlightValidMove(new Position(row, col));
+    private void addBoardListener() {
+        JButton[][] buttons = boardView.getButtons();
+        for (int row = 0; row < buttons.length; row++) {
+            for (int col = 0; col < buttons[row].length; col++) {
+                final int r = row;
+                final int c = col;
+                buttons[row][col].addActionListener(new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        handleButtonClick(r, c);
+                    }
+                });
+            }
         }
-        view.refreshBoard();
     }
 
-    public void start() {
-        view.setVisible(true);
+    private void handleButtonClick(int row, int col) {
+        // Clear highlights before any action
+        boardView.clearHighlight();
+
+        if (selectedRow == -1 && selectedCol == -1) {
+            // First click: select a piece
+            Piece piece = game.getBoard().getPieceAt(row, col);
+            System.out.println("Selected piece at row " + row + ", col " + col);
+
+            if (piece != null && piece.getColor() == game.getCurrentPlayer()) {
+                selectedRow = row;
+                selectedCol = col;
+                // Get valid moves for the selected piece
+                List<int[]> validMoves = game.getValidMoves(row, col);
+                // Call to highlight valid moves
+                boardView.highlightValidMoves(validMoves);
+            }
+        } else {
+            // Second click: attempt a move
+            boolean moveResult = game.makeMove(selectedRow, selectedCol, row, col);
+            if (moveResult) {
+                // Flip the board and update the view if the move is successful
+                game.getBoard().flipBoard();
+                boardView.setBoardFlip(!boardView.isBoardFlip());  // Update flip state to insert pieces image correctly
+                boardView.refreshBoard();
+                boardView.updateLabels();
+            }
+            // Reset selection
+            selectedRow = -1;
+            selectedCol = -1;
+        }
     }
-
-    // private void checkGameState() {
-    //     PieceColor currentPlayer = game.getCurrentPlayerColor();
-    //     boolean inCheck = game.isInCheck(currentPlayer);
-
-    //     if (inCheck) {
-    //         JOptionPane.showMessageDialog(view, currentPlayer + " is in check!");
-    //     }
-    // }
-
-    // private void checkGameOver() {
-    //     if (game.isCheckmate(game.getCurrentPlayerColor())) {
-    //         int response = JOptionPane.showConfirmDialog(view, "Checkmate! Would you like to play again?", "Game Over",
-    //                 JOptionPane.YES_NO_OPTION);
-    //         if (response == JOptionPane.YES_OPTION) {
-    //             game.resetGame();
-    //             view.refreshBoard();
-    //         } else {
-    //             System.exit(0);
-    //         }
-    //     }
-    // }
 }
