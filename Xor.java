@@ -1,11 +1,6 @@
-import java.util.*;
-
 public class Xor extends Piece {
-    private int moveCount; // Track the number of moves to handle transformation
-
     public Xor(PieceColor color, int row, int col) {
         super(color, row, col);
-        this.moveCount = 0;
     }
 
     @Override
@@ -37,54 +32,11 @@ public class Xor extends Piece {
     }
 
     @Override
-    public List<int[]> getValidMoves(Board board) {
-        List<int[]> validMoves = new ArrayList<>();
-
-        // Check all 4 diagonal directions (top-left, top-right, bottom-left, bottom-right)
-        int[][] directions = {
-            {-1, -1}, {-1, 1}, // Top-left, top-right
-            {1, -1}, {1, 1}    // Bottom-left, bottom-right
-        };
-
-        for (int[] direction : directions) {
-            int newRow = getRow();
-            int newCol = getCol();
-
-            // Move in the current direction until the edge of the board or a block
-            while (true) {
-                newRow += direction[0];
-                newCol += direction[1];
-
-                // Stop if out of bounds
-                if (newRow < 0 || newRow >= 8 || newCol < 0 || newCol >= 5) {
-                    break;
-                }
-
-                // Stop if the square is occupied by an ally
-                Piece piece = board.getPieceAt(newRow, newCol);
-                if (piece != null) {
-                    if (piece.getColor() == getColor()) {
-                        break;
-                    }
-                    // Add the move if the square is occupied by an opponent
-                    validMoves.add(new int[]{newRow, newCol});
-                    break;
-                }
-
-                // Add the move if the square is empty
-                validMoves.add(new int[]{newRow, newCol});
-            }
-        }
-
-        return validMoves;
-    }
-
-    @Override
     public void transform() {
         // Replace this piece with a Tor piece
-        Tor transformedPiece = new Tor(getColor(), getRow(), getCol());
+        Tor transformPiece = new Tor(getColor(), getRow(), getCol());
         Board board = Board.getInstance();
-        board.setPieceAt(getRow(), getCol(), transformedPiece);
-        System.out.println("Xor at (" + getRow() + ", " + getCol() + ") transformed into Tor.");
+        board.setPieceAt(transformPiece, getRow(), getCol());
+        System.out.println(this.getColor()+ " Xor at (" + getRow() + ", " + getCol() + ") transformed into Tor.");
     }
 }
