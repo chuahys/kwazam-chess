@@ -59,6 +59,7 @@ public class GameController {
                 if (game.checkForWinner()) {
                     // If a winner is detected, restart the game
                     game.resetGame(); // Update the board view after reset
+                    boardView.setBoardFlip(!boardView.isBoardFlip()); 
                     boardView.refreshBoard();
                     boardView.updateMessage("Game restart!");
                     return; // Exit early since the game has reset
@@ -66,6 +67,7 @@ public class GameController {
 
                 game.getBoard().flipBoard(); // Flip the board if the move is successful 
                 boardView.setBoardFlip(!boardView.isBoardFlip()); // Update flip state to insert pieces image correctly
+                boardView.refreshBoard();
                 boardView.updateMessage("Move successful!");
                 game.checkForWinner(); // Check if Sau is captured and declare winner
             } else {

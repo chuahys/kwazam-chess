@@ -29,6 +29,6 @@ public abstract class Piece {
     // Abstract method to check if a move is valid for this piece
     public abstract boolean isValidMove(Board board, int startRow, int startCol, int endRow, int endCol);
 
-    // Optional transformation logic (e.g., piece promotion or upgrade)
+    // Optional transformation logic (for Tor and Xor pieces)
     public abstract void transform();
 }

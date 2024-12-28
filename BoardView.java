@@ -136,7 +136,6 @@ public class BoardView extends JPanel implements BoardObserver {
     // Method to set the board flipped state
     public void setBoardFlip(boolean flip) {
         this.isFlip = flip;
-        refreshBoard(); // Update the board view after flipping
     }
 
     public boolean isBoardFlip() {

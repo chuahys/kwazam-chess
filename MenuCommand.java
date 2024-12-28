@@ -14,6 +14,7 @@ class RestartCommand implements MenuCommand {
     @Override
     public void execute() {
         game.resetGame();
+        boardView.setBoardFlip(!boardView.isBoardFlip());
         boardView.refreshBoard();
         boardView.updateMessage("Game restart!");
     }
