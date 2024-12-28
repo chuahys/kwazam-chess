@@ -1,10 +1,14 @@
+import java.util.*;
+
 public class Board {
     private static Board instance; // The single instance of Board
     private static final int HEIGHT = 8;
     private static final int WIDTH = 5;
-    private Piece[][] board;      // 2D array for pieces
+    private Piece[][] board; // 2D array for pieces
+    private List<BoardObserver> observers = new ArrayList<>();
 
-    public Board() {
+
+    private Board() {
         board = new Piece[HEIGHT][WIDTH]; // Initialize an 8x5 board
     }
 
@@ -16,6 +20,19 @@ public class Board {
         return instance;
     }
 
+    public int getHeight() {
+        return HEIGHT;
+    }
+
+    public int getWidth() {
+        return WIDTH;
+    }
+
+    // Check if the given position is within bounds
+    public boolean isInBounds(int row, int col) {
+        return row >= 0 && row < HEIGHT && col >= 0 && col < WIDTH;
+    }
+
     // Method to get the piece at a specific position
     public Piece getPieceAt(int row, int col) {
         if (row < 0 || row >= HEIGHT || col < 0 || col >= WIDTH) {
@@ -25,9 +42,26 @@ public class Board {
     }
 
     // Method to set a piece at a specific position
-    public void setPieceAt(int row, int col, Piece piece) {
-        if (row >= 0 && row < HEIGHT && col >= 0 && col < WIDTH) {
+    public void setPieceAt(Piece piece, int row, int col) {
+        if (isInBounds(row, col)) {
             board[row][col] = piece;
+        }
+    }
+
+    // Add an observer to the list
+    public void addObserver(BoardObserver observer) {
+        observers.add(observer);
+    }
+    
+    // Remove an observer from the list
+    public void removeObserver(BoardObserver observer) {
+        observers.remove(observer);
+    }
+
+    // Notify all observers about a piece transformation
+    public void notifyTransform() {
+        for (BoardObserver observer : observers) {
+            observer.refreshBoard(); // Notify observers to refresh the board
         }
     }
 
@@ -53,34 +87,10 @@ public class Board {
         board[0][3] = PieceFactory.createPiece("Biz", PieceColor.RED, 0, 3);
         board[0][4] = PieceFactory.createPiece("Xor", PieceColor.RED, 0, 4);
     }
-
-
-    // Method to move a piece from one position to another
-    public void movePiece(int startRow, int startCol, int endRow, int endCol) {
-        Piece piece = getPieceAt(startRow, startCol);
-        if (piece != null) {
-            setPieceAt(endRow, endCol, piece); // Place the piece at the new position
-            setPieceAt(startRow, startCol, null); // Clear the old position
-            piece.setPosition(endRow, endCol); // Update the piece's internal position
-        }
-    }
     
-    // Method to transform Tor and Xor pieces
-    public void transformPiece() {
-        for (int row = 0; row < HEIGHT; row++) {
-            for (int col = 0; col < WIDTH; col++) {
-                Piece piece = getPieceAt(row, col);
-                if (piece instanceof Tor || piece instanceof Xor) {
-                    piece.transform(); // Call the transform method for the piece
-                    //boardView.updateBoard(); // Update the board after transformation
-                }
-            }
-        }
-    }
-    
-// Flip the board (reverse positions of the pieces)
+    // Flip the board (reverse positions of the pieces)
     public void flipBoard() {
-        Piece[][] boardFlip = new Piece[HEIGHT][WIDTH];
+        Piece[][] tempBoard = new Piece[HEIGHT][WIDTH];
 
         // Iterate over the board to swap positions
         for (int row = 0; row < HEIGHT; row++) {
@@ -94,7 +104,7 @@ public class Board {
                     piece.setPosition(flipRow, flipCol);
 
                     // Place the piece on the flipped board
-                    boardFlip[flipRow][flipCol] = piece;
+                    tempBoard[flipRow][flipCol] = piece;
                 }
             }
         }
@@ -102,13 +112,17 @@ public class Board {
         // Replace the board with the flipped board using setPieceAt
         for (int row = 0; row < HEIGHT; row++) {
             for (int col = 0; col < WIDTH; col++) {
-                setPieceAt(row, col, boardFlip[row][col]);
+                setPieceAt(tempBoard[row][col], row, col);
             }
         }
     }
 
-    // Optional: Reset board (useful for restarting the game)
+    // Reset the board (clear all pieces)
     public void resetBoard() {
-        board = new Piece[HEIGHT][WIDTH]; // Clear the board
+        for (int row = 0; row < HEIGHT; row++) {
+            for (int col = 0; col < WIDTH; col++) {
+                board[row][col] = null;
+            }
+        }
     }
 }

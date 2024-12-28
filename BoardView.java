@@ -2,17 +2,23 @@ import java.awt.*;
 import java.util.List;
 import javax.swing.*;
 
-public class BoardView extends JPanel {
+public class BoardView extends JPanel implements BoardObserver {
+    private Board board;
+    private Game game;
     private JButton[][] buttons;
     private JLabel playerLabel;
     private JLabel countLabel;
-    private Board board;
-    private Game game;
+    private JLabel messageLabel;
     private boolean isFlip = false;  // Flag to track if the board is flipped
+    private String IMAGE_PATH = "resources/img/"; // Base path for images
+    private int height;
+    private int width;
 
     public BoardView(Game game) {
         this.game = game;
         this.board = game.getBoard(); // Get the current board from the game
+        this.height = board.getHeight();
+        this.width = board.getWidth();
         setLayout(new BorderLayout());
 
         // Create and add the Player Label and Move Count Label at the top
@@ -28,12 +34,12 @@ public class BoardView extends JPanel {
         add(infoPanel, BorderLayout.NORTH);
 
         // Add the chessboard in the center
-        JPanel boardPanel = new JPanel(new GridLayout(8, 5));
-        buttons = new JButton[8][5];
+        JPanel boardPanel = new JPanel(new GridLayout(height, width));
+        buttons = new JButton[height][width];
 
         // Initialize buttons for each square and set up the chessboard
-        for (int row = 0; row < 8; row++) {
-            for (int col = 0; col < 5; col++) {
+        for (int row = 0; row < height; row++) {
+            for (int col = 0; col < width; col++) {
                 JButton button = new JButton();
                 button.setPreferredSize(new Dimension(60, 60));
                 button.setBackground(Color.LIGHT_GRAY);
@@ -51,19 +57,23 @@ public class BoardView extends JPanel {
         }
 
         add(boardPanel, BorderLayout.CENTER);
+
+        // Add a message label at the bottom
+        messageLabel = new JLabel("Welcome to Kwazam Chess!", SwingConstants.CENTER);
+        add(messageLabel, BorderLayout.SOUTH);  // Add message box to the bottom of the board view
     }
 
     private String getPieceImagePath(Piece piece) {
         String pieceName = piece.getClass().getSimpleName();
-        String colorPrefix = piece.getColor() == PieceColor.RED ? "r" : "b";
+        String colorName= piece.getColor() == PieceColor.BLUE ? "b" : "r";
         // If the board has been flipped, we need to rotate the image for Ram and Sau
         if (pieceName.equals("Ram") || pieceName.equals("Sau")) {
             // Rotate the image if the board is flipped
             if (isFlip) {
-                return "resources/img/" + colorPrefix + pieceName + "_flip.png";
+                return IMAGE_PATH + colorName + pieceName + "_flip.png";
             }
         }
-        return "resources/img/" + colorPrefix + pieceName + ".png";
+        return IMAGE_PATH + colorName + pieceName + ".png";
     }
 
     private void updatePlayerLabel() {
@@ -74,20 +84,37 @@ public class BoardView extends JPanel {
         countLabel.setText("Move Count: " + game.getMoveCount());
     }
 
-    public void updateBoard() {
-        for (int row = 0; row < 8; row++) {
-            for (int col = 0; col < 5; col++) {
+    public void updateLabels() {
+        updatePlayerLabel();
+        updateMoveCountLabel();
+    }
+
+    public void updateMessage(String message) {
+        messageLabel.setText(message); // Update the message
+    }
+        
+    // BoardObserver class to update the board view
+    @Override
+    public void refreshBoard() {
+        // Update the labels first
+        updateLabels();
+
+        // Update the board buttons
+        for (int row = 0; row < height; row++) {
+            for (int col = 0; col < width; col++) {
                 Piece piece = board.getPieceAt(row, col);
                 if (piece != null) {
                     String imagePath = getPieceImagePath(piece);
                     ImageIcon pieceIcon = new ImageIcon(imagePath);
-                    buttons[row][col].setIcon(pieceIcon);
+                    buttons[row][col].setIcon(pieceIcon);  // Set the piece image on the button
                 } else {
-                    buttons[row][col].setIcon(null); // Clear the icon if no piece
+                    buttons[row][col].setIcon(null);  // Clear icon if no piece
                 }
+                buttons[row][col].setBackground(Color.LIGHT_GRAY);  // Reset button background
             }
         }
-        this.repaint(); // Redraw the panel
+
+        repaint(); // Redraw the panel to update the view
     }
 
     public void highlightValidMoves(List<int[]> validMoves) {
@@ -106,19 +133,10 @@ public class BoardView extends JPanel {
         }
     }
 
-    public void refreshBoard() {
-        updateBoard();
-        updateLabels();
-    }
-
-    public void updateLabels() {
-        updatePlayerLabel();
-        updateMoveCountLabel();
-    }
-
     // Method to set the board flipped state
     public void setBoardFlip(boolean flip) {
         this.isFlip = flip;
+        refreshBoard(); // Update the board view after flipping
     }
 
     public boolean isBoardFlip() {
@@ -127,5 +145,33 @@ public class BoardView extends JPanel {
 
     JButton[][] getButtons() {
         return buttons;
+    }
+
+    public JMenuBar getMenuBar(GameController controller) {
+        JMenuBar menuBar = new JMenuBar();
+
+        // Create Game Menu
+        JMenu gameMenu = new JMenu("Menu");
+        JMenuItem restartItem = new JMenuItem("Restart");
+        JMenuItem saveItem = new JMenuItem("Save");
+        JMenuItem loadItem = new JMenuItem("Load");
+        JMenuItem exitItem = new JMenuItem("Exit");
+
+        // Add action listeners
+        restartItem.addActionListener(e -> controller.restartGame());
+        saveItem.addActionListener(e -> controller.saveGame());
+        loadItem.addActionListener(e -> controller.loadGame());
+        exitItem.addActionListener(e -> controller.exitGame());
+
+        // Add menu items to the menu
+        gameMenu.add(restartItem);
+        gameMenu.add(saveItem);
+        gameMenu.add(loadItem);
+        gameMenu.add(exitItem);
+
+        // Add the menu to the menu bar
+        menuBar.add(gameMenu);
+
+        return menuBar;
     }
 }
