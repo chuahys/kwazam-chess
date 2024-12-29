@@ -7,6 +7,7 @@ public class GameController {
     private BoardView boardView; // View
     private int selectedRow = -1; // Row of selected piece
     private int selectedCol = -1; // Column of selected piece
+    private Board board;
     private final Map<String, MenuCommand> commands = new HashMap<>();
 
     public GameController(Game game, BoardView boardView) {
@@ -82,8 +83,8 @@ public class GameController {
     // Initialize commands for the menu items
     private void initCommand() {
         commands.put("Restart", new RestartCommand(game, boardView));
-        commands.put("Save", new SaveCommand());
-        commands.put("Load", new LoadCommand());
+        commands.put("Save", new SaveCommand(boardView, board, game));
+        commands.put("Load", new LoadCommand(boardView, game));
         commands.put("Exit", new ExitCommand());
     }
     // Method for handling Restart action
