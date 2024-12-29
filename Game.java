@@ -2,15 +2,24 @@ import java.util.*;
 import javax.swing.JOptionPane;
 
 public class Game {
+    private static Game instance; // Singleton instance of Game
     private Board board;
-    private PieceColor currentPlayer; // Use PieceColor to track current player
+    private PieceColor currentPlayer; // Track the current player
     private int moveCount; // Track the number of moves
 
-    public Game() {
+    private Game() {
         board = Board.getInstance(); // Get the single instance of Board
-        currentPlayer = PieceColor.BLUE; // Start with BLUE player
+        this.currentPlayer = PieceColor.BLUE; // Start with BLUE player
         moveCount = 0;
         board.setupPieces(); // Initialize pieces for both players
+    }
+
+    // Singleton pattern to ensure only one instance of Game
+    public static Game getInstance() {
+        if (instance == null) {
+            instance = new Game();
+        }
+        return instance;
     }
 
     public Board getBoard() {
@@ -18,15 +27,22 @@ public class Game {
     }
 
     public PieceColor getCurrentPlayer() {
-        return currentPlayer;
+        return this.currentPlayer;
+    }
+
+    public void setCurrentPlayer(PieceColor currentPlayer) {
+        this.currentPlayer = currentPlayer; // Use `this` to access instance variable
     }
 
     public int getMoveCount() {
         return moveCount;
     }
 
+    public void setMoveCount(int moveCount) {
+        this.moveCount = moveCount;
+    }
+
     public void switchPlayer() {
-        // Switch the current player color
         currentPlayer = (currentPlayer == PieceColor.BLUE) ? PieceColor.RED : PieceColor.BLUE;
         moveCount++;
 
@@ -57,7 +73,7 @@ public class Game {
 
         return validMoves;
     }
-    
+
     // Move the piece on the board
     public boolean movePiece(int startRow, int startCol, int endRow, int endCol) {
         Piece piece = board.getPieceAt(startRow, startCol);
@@ -72,7 +88,7 @@ public class Game {
         }
         return false;
     }
-    
+
     // Method to transform Tor and Xor pieces on the board
     public void transformPiece() {
         for (int row = 0; row < board.getHeight(); row++) {
@@ -97,11 +113,12 @@ public class Game {
         for (int row = 0; row < board.getHeight(); row++) {
             for (int col = 0; col < board.getWidth(); col++) {
                 Piece piece = board.getPieceAt(row, col);
+
                 if (piece instanceof Sau) {
                     if (piece.getColor() == PieceColor.BLUE) {
-                        blueCapture = false; // Blue Sau is still on the board
+                        blueCapture = false;
                     } else if (piece.getColor() == PieceColor.RED) {
-                        redCapture = false; // Red Sau is still on the board
+                        redCapture = false;
                     }
                 }
             }
@@ -110,22 +127,21 @@ public class Game {
         if (blueCapture) {
             // Red wins
             JOptionPane.showMessageDialog(null, "Red wins! Sau captured!");
-            //restartGame(); // Restart the game after the winner is 
+            // restartGame(); // Restart the game after the winner is
             return true;
         } else if (redCapture) {
             // Blue wins
             JOptionPane.showMessageDialog(null, "Blue wins! Sau captured!");
-            //restartGame(); // Restart the game after the winner is declared
+            // restartGame(); // Restart the game after the winner is declared
             return true;
         }
         return false; // No winner yet
     }
-    
-    // Reset the game state
+
     public void resetGame() {
-        this.currentPlayer = PieceColor.BLUE;  // Set starting player
-        this.moveCount = 0; // Reset move count
+        currentPlayer = PieceColor.BLUE; // Reset starting player
+        moveCount = 0; // Reset move count
         board.resetBoard(); // Reset the board
-        board.setupPieces(); // Place pieces on the board in the starting positions
+        board.setupPieces(); // Set initial positions
     }
 }
