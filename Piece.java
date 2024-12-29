@@ -31,4 +31,18 @@ public abstract class Piece {
 
     // Optional transformation logic (for Tor and Xor pieces)
     public abstract void transform();
+
+
+    public String getColorCode() {
+        if (color == PieceColor.RED) {
+            return "R";
+        } else if (color == PieceColor.BLUE) {
+            return "B";
+        }
+        return "";
+    }
+
+    // To return the piece type
+    public abstract String getPieceType();
+
 }
