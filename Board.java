@@ -69,23 +69,23 @@ public class Board {
     public void setupPieces() {
         // Setup Blue pieces (bottom of the board)
         for (int col = 0; col < WIDTH; col++) {
-            board[6][col] = PieceFactory.createPiece("Ram", PieceColor.BLUE, 6, col);
+            board[6][col] = PieceFactory.createPiece(PieceType.RAM, PieceColor.BLUE, 6, col);
         }
-        board[7][0] = PieceFactory.createPiece("Xor", PieceColor.BLUE, 7, 0);
-        board[7][1] = PieceFactory.createPiece("Biz", PieceColor.BLUE, 7, 1);
-        board[7][2] = PieceFactory.createPiece("Sau", PieceColor.BLUE, 7, 2);
-        board[7][3] = PieceFactory.createPiece("Biz", PieceColor.BLUE, 7, 3);
-        board[7][4] = PieceFactory.createPiece("Tor", PieceColor.BLUE, 7, 4);
+        board[7][0] = PieceFactory.createPiece(PieceType.XOR, PieceColor.BLUE, 7, 0);
+        board[7][1] = PieceFactory.createPiece(PieceType.BIZ, PieceColor.BLUE, 7, 1);
+        board[7][2] = PieceFactory.createPiece(PieceType.SAU, PieceColor.BLUE, 7, 2);
+        board[7][3] = PieceFactory.createPiece(PieceType.BIZ, PieceColor.BLUE, 7, 3);
+        board[7][4] = PieceFactory.createPiece(PieceType.TOR, PieceColor.BLUE, 7, 4);
 
         // Setup Red pieces (top of the board)
         for (int col = 0; col < WIDTH; col++) {
-            board[1][col] = PieceFactory.createPiece("Ram", PieceColor.RED, 1, col);
+            board[1][col] = PieceFactory.createPiece(PieceType.RAM, PieceColor.RED, 1, col);
         }
-        board[0][0] = PieceFactory.createPiece("Tor", PieceColor.RED, 0, 0);
-        board[0][1] = PieceFactory.createPiece("Biz", PieceColor.RED, 0, 1);
-        board[0][2] = PieceFactory.createPiece("Sau", PieceColor.RED, 0, 2);
-        board[0][3] = PieceFactory.createPiece("Biz", PieceColor.RED, 0, 3);
-        board[0][4] = PieceFactory.createPiece("Xor", PieceColor.RED, 0, 4);
+        board[0][0] = PieceFactory.createPiece(PieceType.TOR, PieceColor.RED, 0, 0);
+        board[0][1] = PieceFactory.createPiece(PieceType.BIZ, PieceColor.RED, 0, 1);
+        board[0][2] = PieceFactory.createPiece(PieceType.SAU, PieceColor.RED, 0, 2);
+        board[0][3] = PieceFactory.createPiece(PieceType.BIZ, PieceColor.RED, 0, 3);
+        board[0][4] = PieceFactory.createPiece(PieceType.XOR, PieceColor.RED, 0, 4);
     }
     
     // Flip the board (reverse positions of the pieces)
