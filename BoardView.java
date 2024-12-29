@@ -15,8 +15,8 @@ public class BoardView extends JPanel implements BoardObserver {
     private int width;
 
     public BoardView(Game game) {
-        this.game = game;
-        this.board = game.getBoard(); // Get the current board from the game
+        this.game = Game.getInstance();
+        this.board = this.game.getBoard(); // Get the current board from the game
         this.height = board.getHeight();
         this.width = board.getWidth();
         setLayout(new BorderLayout());

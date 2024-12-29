@@ -6,7 +6,7 @@ public class Main {
         SwingUtilities.invokeLater(new Runnable() {
             @Override
             public void run() {
-                Game game = new Game();  // Initialize the game model
+                Game game = Game.getInstance();  // Initialize the game model
                 BoardView boardView = new BoardView(game);  // Pass the Game object to the view constructor
                 GameController controller = new GameController(game, boardView);  // Initialize the controller
 
