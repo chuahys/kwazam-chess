@@ -28,4 +28,9 @@ public class Biz extends Piece {
     public void transform() {
         // No transformation logic for Biz
     }
+
+    @Override
+    public String getPieceType() {
+        return PieceType.BIZ.name(); // Return the name of the PieceType as a String
+    }
 }
