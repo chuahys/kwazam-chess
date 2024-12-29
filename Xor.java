@@ -37,6 +37,11 @@ public class Xor extends Piece {
         Tor transformPiece = new Tor(getColor(), getRow(), getCol());
         Board board = Board.getInstance();
         board.setPieceAt(transformPiece, getRow(), getCol());
-        System.out.println(this.getColor()+ " Xor at (" + getRow() + ", " + getCol() + ") transformed into Tor.");
+        System.out.println(this.getColor() + " Xor at (" + getRow() + ", " + getCol() + ") transformed into Tor.");
+    }
+    
+    @Override
+    public String getPieceType() {
+        return PieceType.XOR.name(); // Return the name of the PieceType as a String
     }
 }

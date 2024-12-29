@@ -45,5 +45,10 @@ public class Ram extends Piece {
     public void transform() {
         // No transformation for Ram, it just moves forward
     }
+
+    @Override
+    public String getPieceType() {
+        return PieceType.RAM.name(); // Return the name of the PieceType as a String
+    }
     
 }
