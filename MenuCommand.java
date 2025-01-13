@@ -1,6 +1,6 @@
-import javax.swing.*;
 import java.io.*;
-import java.util.Scanner;
+import java.util.*;
+import javax.swing.*;
 
 public interface MenuCommand {
     void execute();
@@ -38,6 +38,13 @@ class SaveCommand implements MenuCommand {
     @Override
     public void execute() {
         try {
+            // Ensure the SAVE directory exists
+            File saveDir = new File("SAVE");
+            // Create the directory if it doesn't exist
+            if (!saveDir.exists()) {
+                saveDir.mkdirs(); 
+            }
+        
             String filename;
 
             while (true) {
