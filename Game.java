@@ -1,5 +1,4 @@
 import java.util.*;
-import javax.swing.JOptionPane;
 
 public class Game {
     private static Game instance; // Singleton instance of Game
@@ -105,37 +104,36 @@ public class Game {
         board.notifyTransform();
     }
 
-    public boolean checkForWinner() {
-        // Check if either Sau is captured by checking the board state
-        boolean blueCapture = true;
-        boolean redCapture = true;
+    public PieceColor checkWinner() {
+        boolean blueSauCaptured = true;
+        boolean redSauCaptured = true;
 
+        // Iterate over all rows and columns of the board
         for (int row = 0; row < board.getHeight(); row++) {
             for (int col = 0; col < board.getWidth(); col++) {
                 Piece piece = board.getPieceAt(row, col);
 
                 if (piece instanceof Sau) {
+                    // If the Sau piece is found, check its color
                     if (piece.getColor() == PieceColor.BLUE) {
-                        blueCapture = false;
+                        blueSauCaptured = false; // Blue's Sau is still on the board
                     } else if (piece.getColor() == PieceColor.RED) {
-                        redCapture = false;
+                        redSauCaptured = false; // Red's Sau is still on the board
                     }
                 }
             }
         }
-
-        if (blueCapture) {
-            // Red wins
-            JOptionPane.showMessageDialog(null, "Red wins! Sau captured!");
-            // restartGame(); // Restart the game after the winner is
-            return true;
-        } else if (redCapture) {
-            // Blue wins
-            JOptionPane.showMessageDialog(null, "Blue wins! Sau captured!");
-            // restartGame(); // Restart the game after the winner is declared
-            return true;
+        // Return the winner
+        // If Blue's Sau is captured, Red wins
+        if (blueSauCaptured) {
+            return PieceColor.RED;
         }
-        return false; // No winner yet
+        // If Red's Sau is captured, Blue wins
+        if (redSauCaptured) {
+            return PieceColor.BLUE;
+        }
+        // No winner yet
+        return null;
     }
 
     public void resetGame() {
