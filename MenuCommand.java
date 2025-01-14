@@ -98,7 +98,7 @@ class SaveCommand implements MenuCommand {
                         Piece piece = board.getPieceAt(row, col);
 
                         if (piece != null) {
-                            String playerColor = piece.getColor() == PieceColor.RED ? "Red" : "Blue";
+                            String playerColor = piece.getColor() == PieceColor.RED ? "R" : "B";
                             String pieceType = piece.getPieceType().toString();
 
                             // Inv?
@@ -173,9 +173,6 @@ class LoadCommand implements MenuCommand {
                     PieceColor currentPlayer = PieceColor.valueOf(currentPlayerString.toUpperCase());
                     game.setCurrentPlayer(currentPlayer);
 
-                    int moveCount = Integer.parseInt(scanner.nextLine().split(": ")[1].trim());
-                    game.setMoveCount(moveCount);
-
                     // Load the board state
                     for (int row = 0; row < board.getHeight(); row++) {
                         String line = scanner.nextLine();
@@ -184,13 +181,28 @@ class LoadCommand implements MenuCommand {
                         for (int col = 0; col < board.getWidth(); col++) {
                             String pieceInfo = pieces[col];
 
-                            if (!pieceInfo.equals("EMPTY")) {
-                                char colorCode = pieceInfo.charAt(0);
-                                String pieceTypeStr = pieceInfo.substring(1); // Extract the piece type string
+                            char colorCode = pieceInfo.charAt(0);
+                            String pieceTypeStr = pieceInfo.substring(1); // Extract the piece type string
 
-                                PieceColor color = colorCode == 'r' ? PieceColor.RED : PieceColor.BLUE;
-                                PieceType pieceType = PieceType.valueOf(pieceTypeStr.toUpperCase()); // Convert to
-                                                                                                     // PieceType
+                            if (!pieceInfo.equals("EMPTY")) {
+
+                                if (colorCode == 'n' || colorCode == 'N') {
+                                    continue;
+                                }
+                                
+                                PieceColor color = (colorCode == 'r' || colorCode == 'R') ? PieceColor.RED
+                                        : (colorCode == 'b' || colorCode == 'B') ? PieceColor.BLUE :null;
+
+                                if (color == null) {
+                                    throw new IOException("Invalid piece color code: " + colorCode);
+                                }
+
+                                PieceType pieceType;
+                                try {
+                                    pieceType = PieceType.valueOf(pieceTypeStr.toUpperCase());
+                                } catch (IllegalArgumentException e) {
+                                    throw new IOException("Invalid piece type: " + pieceTypeStr);
+                                }
 
                                 // Create and place the piece on the board
                                 Piece loadedPiece = PieceFactory.createPiece(pieceType, color, row, col);
