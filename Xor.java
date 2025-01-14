@@ -4,6 +4,15 @@ public class Xor extends Piece {
     }
 
     @Override
+    public String getImagePath(boolean isFlip) {
+        String pieceName = "Xor";
+        String colorName = getColor() == PieceColor.BLUE ? "b" : "r";
+
+        // Xor does not have flipped images
+        return "resources/img/" + colorName + pieceName + ".png";
+    }
+    
+    @Override
     public boolean isValidMove(Board board, int startRow, int startCol, int endRow, int endCol) {
         // Must move diagonally (row and column must change by the same amount)
         if (Math.abs(endRow - startRow) != Math.abs(endCol - startCol)) {

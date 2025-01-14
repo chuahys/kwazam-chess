@@ -4,6 +4,15 @@ public class Tor extends Piece {
     }
 
     @Override
+    public String getImagePath(boolean isFlip) {
+        String pieceName = "Tor";
+        String colorName = getColor() == PieceColor.BLUE ? "b" : "r";
+
+        // Tor does not have flipped images
+        return "resources/img/" + colorName + pieceName + ".png";
+    }
+
+    @Override
     public boolean isValidMove(Board board, int startRow, int startCol, int endRow, int endCol) {
         // Must move orthogonally (either same row or same column)
         if (startRow != endRow && startCol != endCol) {

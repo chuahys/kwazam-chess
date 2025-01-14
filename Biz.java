@@ -3,6 +3,15 @@ public class Biz extends Piece {
         super(color, row, col);
     }
 
+     @Override
+    public String getImagePath(boolean isFlip) {
+        String pieceName = "Biz";
+        String colorName = getColor() == PieceColor.BLUE ? "b" : "r";
+
+        // Biz does not have flipped images
+        return "resources/img/" + colorName + pieceName + ".png";
+    }
+
     @Override
     public boolean isValidMove(Board board, int startRow, int startCol, int endRow, int endCol) {
         // Calculate the move differences
