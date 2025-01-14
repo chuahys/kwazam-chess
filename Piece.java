@@ -26,12 +26,17 @@ public abstract class Piece {
         this.col = col;
     }
 
+    // Abstract method to get the image path
+    public abstract String getImagePath(boolean isFlip); // Pass flip state
+
     // Abstract method to check if a move is valid for this piece
     public abstract boolean isValidMove(Board board, int startRow, int startCol, int endRow, int endCol);
 
-    // Optional transformation logic (for Tor and Xor pieces)
+    // Optional transformation logic (for Tor and Xor pieces only)
     public abstract void transform();
 
+    // To return the piece type
+    public abstract String getPieceType();
 
     public String getColorCode() {
         if (color == PieceColor.RED) {
@@ -41,8 +46,4 @@ public abstract class Piece {
         }
         return "";
     }
-
-    // To return the piece type
-    public abstract String getPieceType();
-
 }
