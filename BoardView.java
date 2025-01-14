@@ -5,13 +5,12 @@ import javax.swing.*;
 /**
  * BoardView class is responsible for displaying the game board.
  * It observes the Board and updates the view accordingly.
- * 
  * @author Chuah Yun Shan
  */
 public class BoardView extends JPanel implements BoardObserver {
     private Board board;
     private Game game;
-    private JButton[][] buttons;
+    private JButton[][] button;
     private JLabel playerLabel;
     private JLabel countLabel;
     private JLabel messageLabel;
@@ -91,27 +90,26 @@ public class BoardView extends JPanel implements BoardObserver {
      */
     private JPanel createBoardPanel() {
         JPanel boardPanel = new JPanel(new GridLayout(height, width));
-        buttons = new JButton[height][width];
+        button = new JButton[height][width];
 
         // Initialize buttons for each square and set up the chessboard
         for (int row = 0; row < height; row++) {
             for (int col = 0; col < width; col++) {
-                JButton button = new JButton();
-                button.setPreferredSize(new Dimension(60, 60));
-                button.setBackground(Color.LIGHT_GRAY);
-                buttons[row][col] = button;
-                boardPanel.add(button);
+                JButton btn = new JButton();
+                btn.setPreferredSize(new Dimension(60, 60));
+                btn.setBackground(Color.LIGHT_GRAY);
+                button[row][col] = btn;
+                boardPanel.add(btn);
 
                 // Set piece icon if there's a piece on this square
                 Piece piece = board.getPieceAt(row, col);
                 if (piece != null) {
-                    String imagePath = piece.getImagePath(isFlip);
-                    ImageIcon pieceIcon = new ImageIcon(imagePath);
-                    button.setIcon(pieceIcon);
+                    String imgPath = piece.getImagePath(isFlip);
+                    ImageIcon icon = new ImageIcon(imgPath);
+                    btn.setIcon(icon);
                 }
             }
         }
-
         return boardPanel;
     }
 
@@ -186,11 +184,11 @@ public class BoardView extends JPanel implements BoardObserver {
                 if (piece != null) {
                     String imagePath = piece.getImagePath(isFlip); // Get the image path from pieces
                     ImageIcon pieceIcon = new ImageIcon(imagePath); // Create piece icon
-                    buttons[row][col].setIcon(pieceIcon); // Set the piece image on the button
+                    button[row][col].setIcon(pieceIcon); // Set the piece image on the button
                 } else {
-                    buttons[row][col].setIcon(null); // Clear icon if no piece
+                    button[row][col].setIcon(null); // Clear icon if no piece
                 }
-                buttons[row][col].setBackground(Color.LIGHT_GRAY); // Reset button background
+                button[row][col].setBackground(Color.LIGHT_GRAY); // Reset button background
             }
         }
         repaint(); // Redraw the panel to update the view
@@ -203,7 +201,7 @@ public class BoardView extends JPanel implements BoardObserver {
         for (int[] move : validMoves) {
             int row = move[0];
             int col = move[1];
-            buttons[row][col].setBackground(Color.GREEN); // Highlight valid moves
+            button[row][col].setBackground(Color.GREEN); // Highlight valid moves
         }
     }
 
@@ -213,7 +211,7 @@ public class BoardView extends JPanel implements BoardObserver {
     public void clearHighlight() {
         for (int row = 0; row < height; row++) {
             for (int col = 0; col < width; col++) {
-                buttons[row][col].setBackground(Color.LIGHT_GRAY); // Reset the background color
+                button[row][col].setBackground(Color.LIGHT_GRAY); // Reset the background color
             }
         }
     }
@@ -235,8 +233,8 @@ public class BoardView extends JPanel implements BoardObserver {
     /**
      * Returns the 2D array of buttons representing the board squares.
      */
-    JButton[][] getButtons() {
-        return buttons;
+    JButton[][] getButton() {
+        return button;
     }
 
     /**

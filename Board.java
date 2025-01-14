@@ -1,18 +1,26 @@
 import java.util.*;
 
+/**
+ * The Board class represents the game board and manages the pieces on it.
+ */
 public class Board {
     private static Board instance; // The single instance of Board
-    private static final int HEIGHT = 8;
-    private static final int WIDTH = 5;
+    private static final int HEIGHT = 8; // fixed rows
+    private static final int WIDTH = 5; // fixed columns
     private Piece[][] board; // 2D array for pieces
-    private List<BoardObserver> observers = new ArrayList<>();
+    private List<BoardObserver> observer = new ArrayList<>(); // List of observers for the board
 
-
+    /**
+     * Private constructor for Board.
+     */
     private Board() {
         board = new Piece[HEIGHT][WIDTH]; // Initialize an 8x5 board
     }
 
-    // Singleton pattern to ensure only one instance of Board
+    /**
+     * Singleton pattern to ensure only one instance of the Board class.
+     * @author Chuah Yun Shan
+     */
     public static Board getInstance() {
         if (instance == null) {
             instance = new Board(); // Create the instance if it doesn't exist
@@ -20,20 +28,23 @@ public class Board {
         return instance;
     }
 
+    /**
+     * Get the number of rows of the board.
+     */
     public int getHeight() {
         return HEIGHT;
     }
 
+    /**
+     * Get the number of columns of the board.
+     */
     public int getWidth() {
         return WIDTH;
     }
 
-    // Check if the given position is within bounds
-    public boolean isInBounds(int row, int col) {
-        return row >= 0 && row < HEIGHT && col >= 0 && col < WIDTH;
-    }
-
-    // Method to get the piece at a specific position
+    /**
+     * Get the piece at a specific position on the board.
+     */
     public Piece getPieceAt(int row, int col) {
         if (row < 0 || row >= HEIGHT || col < 0 || col >= WIDTH) {
             return null; // Return null for out-of-bounds indices
@@ -41,31 +52,42 @@ public class Board {
         return board[row][col];
     }
 
-    // Method to set a piece at a specific position
+    /**
+     * Place a piece at a specific position on the board.
+     */
     public void setPieceAt(Piece piece, int row, int col) {
-        if (isInBounds(row, col)) {
+        if (row >= 0 && row < HEIGHT && col >= 0 && col < WIDTH) {
             board[row][col] = piece;
         }
     }
 
-    // Add an observer to the list
-    public void addObserver(BoardObserver observer) {
-        observers.add(observer);
+    /**
+     * Add an observer to the board.
+     */
+    public void addObserver(BoardObserver ob) {
+        observer.add(ob);
     }
     
-    // Remove an observer from the list
-    public void removeObserver(BoardObserver observer) {
-        observers.remove(observer);
+    /**
+     * Remove an observer from the board.
+     */
+    public void removeObserver(BoardObserver ob) {
+        observer.remove(ob);
     }
 
-    // Notify all observers about a piece transformation
+    /**
+     * Notify all observers about a piece transformation on the board.
+     */
     public void notifyTransform() {
-        for (BoardObserver observer : observers) {
-            observer.refreshBoard(); // Notify observers to refresh the board
+        for (BoardObserver ob : observer) {
+            ob.refreshBoard(); // Notify observers to refresh the board
         }
     }
 
-    // Add pieces to the board in their initial positions
+    /**
+     * Set up the initial positions of all pieces on the board.
+     * @author Tan Yun Xuan
+     */
     public void setupPieces() {
         // Setup Blue pieces (bottom of the board)
         for (int col = 0; col < WIDTH; col++) {
@@ -88,7 +110,10 @@ public class Board {
         board[0][4] = PieceFactory.createPiece(PieceType.XOR, PieceColor.RED, 0, 4);
     }
     
-    // Flip the board (reverse positions of the pieces)
+    /** 
+     * Flip the board (reverse positions of the pieces)
+     * @author Chuah Yun Shan
+     */
     public void flipBoard() {
         Piece[][] tempBoard = new Piece[HEIGHT][WIDTH];
 
@@ -109,7 +134,7 @@ public class Board {
             }
         }
 
-        // Replace the board with the flipped board using setPieceAt
+        // Replace the board with the flipped board using setPieceAt()
         for (int row = 0; row < HEIGHT; row++) {
             for (int col = 0; col < WIDTH; col++) {
                 setPieceAt(tempBoard[row][col], row, col);
@@ -117,7 +142,10 @@ public class Board {
         }
     }
 
-    // Reset the board (clear all pieces)
+    /**
+     * Reset the board (clear all pieces).
+     * @author Chuah Yun Shan
+     */
     public void resetBoard() {
         for (int row = 0; row < HEIGHT; row++) {
             for (int col = 0; col < WIDTH; col++) {
