@@ -1,19 +1,19 @@
-import java.awt.event.*;
 import java.util.*;
 import javax.swing.*;
 
 public class GameController {
     private Game game; // Model
+    private Board board;
     private BoardView boardView; // View
     private int selectedRow = -1; // Row of selected piece
     private int selectedCol = -1; // Column of selected piece
-    private Board board;
     private final Map<String, MenuCommand> commands = new HashMap<>();
 
     public GameController(Game game, BoardView boardView) {
         this.game = game;
         this.boardView = boardView;
         addBoardListener();
+        addMenuListener();
         initCommand();
     }
 
@@ -23,14 +23,26 @@ public class GameController {
             for (int col = 0; col < buttons[row].length; col++) {
                 final int r = row;
                 final int c = col;
-                buttons[row][col].addActionListener(new ActionListener() {
-                    @Override
-                    public void actionPerformed(ActionEvent e) {
-                        handleButtonClick(r, c);
-                    }
-                });
+                buttons[row][col].addActionListener(e-> handleButtonClick(r, c));
             }
         }
+    }
+
+    private void addMenuListener() {
+        // Get menu items from the view (BoardView)
+        JMenu gameMenu = boardView.getMenuBar().getMenu(0);
+        
+        // Get individual menu items
+        JMenuItem restartItem = gameMenu.getItem(0);
+        JMenuItem saveItem = gameMenu.getItem(1);
+        JMenuItem loadItem = gameMenu.getItem(2);
+        JMenuItem exitItem = gameMenu.getItem(3);
+
+        // Add action listeners to these items
+        restartItem.addActionListener(e -> restartGame());
+        saveItem.addActionListener(e -> saveGame());
+        loadItem.addActionListener(e -> loadGame());
+        exitItem.addActionListener(e -> exitGame());
     }
 
     private void handleButtonClick(int row, int col) {
@@ -39,7 +51,7 @@ public class GameController {
 
         if (selectedRow == -1 && selectedCol == -1) {
             // First click: select a piece
-            Piece piece = game.getBoard().getPieceAt(row, col);
+            Piece piece = game.getBoard().getPieceAt(row, col); 
             if (piece != null && piece.getColor() == game.getCurrentPlayer()) {
                 selectedRow = row;
                 selectedCol = col;
@@ -57,20 +69,24 @@ public class GameController {
             boolean moveSuccess = game.movePiece(selectedRow, selectedCol, row, col);
             if (moveSuccess) {
                 // Check if the game has a winner (Sau captured)
-                if (game.checkForWinner()) {
-                    // If a winner is detected, restart the game
+                PieceColor winner = game.checkWinner();
+                if (winner!=null) {
+                    // If a winner is detected
+                    boardView.refreshBoard(); // Update the board view
+                    boardView.showWinnerMessage(winner);
+                    // Restart the game
                     game.resetGame(); // Update the board view after reset
-                    boardView.setBoardFlip(!boardView.isBoardFlip()); 
-                    boardView.refreshBoard();
+                    boardView.setBoardFlip(false); // Reset the board flip state
+                    boardView.refreshBoard(); // Update the board view
                     boardView.updateMessage("Game restart!");
                     return; // Exit early since the game has reset
                 }
 
                 game.getBoard().flipBoard(); // Flip the board if the move is successful 
                 boardView.setBoardFlip(!boardView.isBoardFlip()); // Update flip state to insert pieces image correctly
-                boardView.refreshBoard();
+                boardView.refreshBoard(); // Update the board view after the move
                 boardView.updateMessage("Move successful!");
-                game.checkForWinner(); // Check if Sau is captured and declare winner
+                
             } else {
                 boardView.updateMessage("Invalid move. Try again.");
             }

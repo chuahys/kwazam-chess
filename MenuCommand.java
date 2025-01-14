@@ -6,6 +6,9 @@ public interface MenuCommand {
     void execute();
 }
 
+/**
+ * RestartCommand class handles the restart action for the menu.
+ */
 class RestartCommand implements MenuCommand {
     private final Game game;
     private final BoardView boardView;
@@ -18,12 +21,15 @@ class RestartCommand implements MenuCommand {
     @Override
     public void execute() {
         game.resetGame();
-        boardView.setBoardFlip(!boardView.isBoardFlip());
+        boardView.setBoardFlip(false);
         boardView.refreshBoard();
         boardView.updateMessage("Game restart!");
     }
 }
 
+/**
+ * SaveCommand class handles the save action for the menu.
+ */
 class SaveCommand implements MenuCommand {
     private BoardView boardView;
     private Board board;
@@ -42,9 +48,9 @@ class SaveCommand implements MenuCommand {
             File saveDir = new File("SAVE");
             // Create the directory if it doesn't exist
             if (!saveDir.exists()) {
-                saveDir.mkdirs(); 
+                saveDir.mkdirs();
             }
-        
+
             String filename;
 
             while (true) {
@@ -121,6 +127,9 @@ class SaveCommand implements MenuCommand {
     }
 }
 
+/**
+ * LoadCommand class handles the load action for the menu.
+ */
 class LoadCommand implements MenuCommand {
     private Board board;
     private BoardView boardView;
@@ -211,9 +220,20 @@ class LoadCommand implements MenuCommand {
     }
 }
 
+/**
+ * ExitCommand class handles the exit action for the menu.
+ */
 class ExitCommand implements MenuCommand {
     @Override
     public void execute() {
-        System.exit(0);
+        // Show a confirmation dialog before exiting
+        int response = JOptionPane.showConfirmDialog(null, "Are you sure you want to exit?", 
+                                                     "Exit Confirmation", JOptionPane.YES_NO_OPTION);
+
+        // If the user confirms, exit the application
+        if (response == JOptionPane.YES_OPTION) {
+            System.exit(0);
+        }
+        // If the user chooses "No", do nothing and return to the game
     }
 }
