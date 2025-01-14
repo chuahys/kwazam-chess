@@ -13,8 +13,8 @@ class RestartCommand implements MenuCommand {
     private final Game game;
     private final BoardView boardView;
 
-    public RestartCommand(Game game, BoardView boardView) {
-        this.game = game;
+    public RestartCommand(BoardView boardView) {
+        this.game = Game.getInstance();
         this.boardView = boardView;
     }
 
@@ -29,16 +29,19 @@ class RestartCommand implements MenuCommand {
 
 /**
  * SaveCommand class handles the save action for the menu.
+ * @author Tan Yun Xuan
+ * @author Lee Kar Yen
+ * @author Chuah Yun Shan
  */
 class SaveCommand implements MenuCommand {
     private BoardView boardView;
     private Board board;
     private Game game;
 
-    public SaveCommand(BoardView boardView, Board board, Game game) {
+    public SaveCommand(BoardView boardView) {
         this.boardView = boardView;
         this.board = Board.getInstance();
-        this.game = game;
+        this.game = Game.getInstance();
     }
 
     @Override
@@ -87,9 +90,15 @@ class SaveCommand implements MenuCommand {
             }
 
             try (BufferedWriter writer = new BufferedWriter(new FileWriter(new File("SAVE", filename)))) {
-                writer.write("Game Saved");
+                writer.write("Game Saved (B-Blue R-Red)");
                 writer.newLine();
-                writer.write("Current turn: " + game.getCurrentPlayer());
+                writer.write("Current player: " + game.getCurrentPlayer());
+                writer.newLine();
+                writer.write("Move count: " + game.getMoveCount());
+                writer.newLine();
+
+                // Save the board flip state
+                writer.write("Board Flip: " + boardView.isBoardFlip());
                 writer.newLine();
 
                 // Loop through the board and save each piece
@@ -101,9 +110,14 @@ class SaveCommand implements MenuCommand {
                             String playerColor = piece.getColor() == PieceColor.RED ? "R" : "B";
                             String pieceType = piece.getPieceType().toString();
 
-                            // Inv?
-
-                            writer.write(playerColor + pieceType);
+                            // Save piece data along with its direction for Ram pieces
+                            if (piece instanceof Ram) {
+                                Ram ram = (Ram) piece;
+                                String direction = ram.getDirection(); // Get the direction up or down
+                                writer.write(playerColor + pieceType + "," + direction); // Save Ram's direction
+                            } else {
+                                writer.write(playerColor + pieceType);
+                            }
                         } else {
                             writer.write("NULL");
                         }
@@ -129,16 +143,19 @@ class SaveCommand implements MenuCommand {
 
 /**
  * LoadCommand class handles the load action for the menu.
+ * @author Tan Yun Xuan
+ * @author Lee Kar Yen
+ * @author Chuah Yun Shan
  */
 class LoadCommand implements MenuCommand {
-    private Board board;
     private BoardView boardView;
+    private Board board;
     private Game game;
 
-    public LoadCommand(BoardView boardView, Game game) {
-        this.board = Board.getInstance(); // Get the singleton instance of the Board
+    public LoadCommand(BoardView boardView) {
         this.boardView = boardView;
-        this.game = game;
+        this.board = Board.getInstance(); // Get the singleton instance of the Board
+        this.game = Game.getInstance();
     }
 
     @Override
@@ -164,7 +181,7 @@ class LoadCommand implements MenuCommand {
 
                 try (Scanner scanner = new Scanner(file)) {
                     // Read the header line for validation
-                    if (!scanner.nextLine().equals("Game Saved")) {
+                    if (!scanner.nextLine().equals("Game Saved (B-Blue R-Red)")) {
                         throw new IOException("Invalid save file format");
                     }
 
@@ -173,6 +190,16 @@ class LoadCommand implements MenuCommand {
                     PieceColor currentPlayer = PieceColor.valueOf(currentPlayerString.toUpperCase());
                     game.setCurrentPlayer(currentPlayer);
 
+                    // Load the move count
+                    String moveCountString = scanner.nextLine().split(": ")[1].trim();
+                    int moveCount = Integer.parseInt(moveCountString);
+                    game.setMoveCount(moveCount);
+
+                    // Load the board flip state
+                    String flipStateLine = scanner.nextLine();
+                    boolean isBoardFlipped = flipStateLine.split(": ")[1].equalsIgnoreCase("true");
+                    boardView.setBoardFlip(isBoardFlipped);
+
                     // Load the board state
                     for (int row = 0; row < board.getHeight(); row++) {
                         String line = scanner.nextLine();
@@ -180,34 +207,41 @@ class LoadCommand implements MenuCommand {
 
                         for (int col = 0; col < board.getWidth(); col++) {
                             String pieceInfo = pieces[col];
-
-                            char colorCode = pieceInfo.charAt(0);
-                            String pieceTypeStr = pieceInfo.substring(1); // Extract the piece type string
-
-                            if (!pieceInfo.equals("EMPTY")) {
-
-                                if (colorCode == 'n' || colorCode == 'N') {
-                                    continue;
-                                }
-                                
-                                PieceColor color = (colorCode == 'r' || colorCode == 'R') ? PieceColor.RED
-                                        : (colorCode == 'b' || colorCode == 'B') ? PieceColor.BLUE :null;
-
-                                if (color == null) {
-                                    throw new IOException("Invalid piece color code: " + colorCode);
-                                }
-
-                                PieceType pieceType;
-                                try {
-                                    pieceType = PieceType.valueOf(pieceTypeStr.toUpperCase());
-                                } catch (IllegalArgumentException e) {
-                                    throw new IOException("Invalid piece type: " + pieceTypeStr);
-                                }
-
-                                // Create and place the piece on the board
-                                Piece loadedPiece = PieceFactory.createPiece(pieceType, color, row, col);
-                                board.setPieceAt(loadedPiece, row, col);
+                         
+                            if (pieceInfo.equals("NULL")) {
+                                continue; // No piece at this position
                             }
+
+                            // Split the pieceInfo to extract color and type
+                            String[] pieceData = pieceInfo.split(",");
+
+                            char colorCode = pieceData[0].charAt(0); // Extract the color
+                            String pieceTypeStr = pieceData[0].substring(1); // Extract the piece type
+                            String direction = pieceData.length > 1 ? pieceData[1] : null; // If there is a direction, it will be the second part
+
+                            PieceColor color = (colorCode == 'r' || colorCode == 'R') ? PieceColor.RED
+                                    : (colorCode == 'b' || colorCode == 'B') ? PieceColor.BLUE :null;
+
+                            if (color == null) {
+                                throw new IOException("Invalid piece color code: " + colorCode);
+                            }
+
+                            PieceType pieceType;
+                            try {
+                                pieceType = PieceType.valueOf(pieceTypeStr.toUpperCase());
+                            } catch (IllegalArgumentException e) {
+                                throw new IOException("Invalid piece type: " + pieceTypeStr);
+                            }
+
+                            // Create and place the piece on the board
+                            Piece loadedPiece = PieceFactory.createPiece(pieceType, color, row, col);
+                            // If the piece is a Ram, load the direction too
+                            if (loadedPiece instanceof Ram) {
+                                ((Ram) loadedPiece).setDirection(direction); // Set the direction of the Ram piece
+                            }
+                            // Place the piece on the board
+                            board.setPieceAt(loadedPiece, row, col);
+                            
                         }
                     }
 
@@ -225,10 +259,6 @@ class LoadCommand implements MenuCommand {
             JOptionPane.showMessageDialog(boardView, "Error loading game", "Error", JOptionPane.ERROR_MESSAGE);
             ex.printStackTrace();
         }
-    }
-
-    private void refresh() {
-        boardView.refreshBoard();
     }
 }
 

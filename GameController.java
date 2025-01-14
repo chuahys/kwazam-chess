@@ -128,9 +128,9 @@ public class GameController {
      * Initializes menu commands and maps them to specific actions.
      */
     private void initCommand() {
-        commands.put("Restart", new RestartCommand(game, boardView));
-        commands.put("Save", new SaveCommand(boardView, board, game));
-        commands.put("Load", new LoadCommand(boardView, game));
+        commands.put("Restart", new RestartCommand(boardView));
+        commands.put("Save", new SaveCommand(boardView));
+        commands.put("Load", new LoadCommand(boardView));
         commands.put("Exit", new ExitCommand());
     }
 

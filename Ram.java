@@ -119,4 +119,24 @@ public class Ram extends Piece {
     public String getPieceType() {
         return PieceType.RAM.name(); // Return the name of the PieceType as a String
     }
+
+     /**
+     * Returns the direction of the Ram piece.
+     * @return "up" if moving up, "down" if moving down
+     */
+    public String getDirection() {
+        return movingUp ? "up" : "down"; // Return the current direction
+    }
+
+    /**
+     * Set the direction of the Ram piece.
+     * @param direction "up" or "down"
+     */
+    public void setDirection(String direction) {
+        if ("up".equals(direction)) {
+            movingUp = true;
+        } else if ("down".equals(direction)) {
+            movingUp = false;
+        }
+    }
 }
