@@ -18,7 +18,7 @@ public class Sau extends Piece {
 
     @Override
     public boolean isValidMove(Board board, int startRow, int startCol, int endRow, int endCol) {
-        // The Sau can move one step in any direction
+        // The Sau can only move one step in any direction
         if (Math.abs(endRow - startRow) <= 1 && Math.abs(endCol - startCol) <= 1) {
             // Check if the target square is occupied by an ally
             Piece targetPiece = board.getPieceAt(endRow, endCol);

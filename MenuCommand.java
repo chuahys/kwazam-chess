@@ -91,6 +91,8 @@ class SaveCommand implements MenuCommand {
                 writer.newLine();
                 writer.write("Current turn: " + game.getCurrentPlayer());
                 writer.newLine();
+                writer.write("Move Count: " + game.getMoveCount());
+                writer.newLine();
 
                 // Loop through the board and save each piece
                 for (int row = 0; row < board.getHeight(); row++) {
@@ -168,43 +170,40 @@ class LoadCommand implements MenuCommand {
                         throw new IOException("Invalid save file format");
                     }
 
-                    // Load the current player and move count
+                    // Load the current player 
                     String currentPlayerString = scanner.nextLine().split(": ")[1].trim();
                     PieceColor currentPlayer = PieceColor.valueOf(currentPlayerString.toUpperCase());
                     game.setCurrentPlayer(currentPlayer);
+
+                    //load move count
+                    int moveCount = Integer.parseInt(scanner.nextLine().split(": ")[1].trim());
+                    game.setMoveCount(moveCount);
 
                     // Load the board state
                     for (int row = 0; row < board.getHeight(); row++) {
                         String line = scanner.nextLine();
                         String[] pieces = line.split(" "); // Split by space
 
+
                         for (int col = 0; col < board.getWidth(); col++) {
                             String pieceInfo = pieces[col];
 
-                            char colorCode = pieceInfo.charAt(0);
-                            String pieceTypeStr = pieceInfo.substring(1); // Extract the piece type string
+                            char colorCode = pieceInfo.charAt(0); //Identify the color of piece
+                            String pieceTypeStr = pieceInfo.substring(1); // Check the PieceType from the second word
 
                             if (!pieceInfo.equals("EMPTY")) {
 
                                 if (colorCode == 'n' || colorCode == 'N') {
                                     continue;
-                                }
+                                }  //if the save file detected null it will continue skip the space
                                 
                                 PieceColor color = (colorCode == 'r' || colorCode == 'R') ? PieceColor.RED
                                         : (colorCode == 'b' || colorCode == 'B') ? PieceColor.BLUE :null;
 
-                                if (color == null) {
-                                    throw new IOException("Invalid piece color code: " + colorCode);
-                                }
-
                                 PieceType pieceType;
-                                try {
-                                    pieceType = PieceType.valueOf(pieceTypeStr.toUpperCase());
-                                } catch (IllegalArgumentException e) {
-                                    throw new IOException("Invalid piece type: " + pieceTypeStr);
-                                }
-
-                                // Create and place the piece on the board
+                                pieceType = PieceType.valueOf(pieceTypeStr.toUpperCase());
+                    
+                                // loaded the piece to the board
                                 Piece loadedPiece = PieceFactory.createPiece(pieceType, color, row, col);
                                 board.setPieceAt(loadedPiece, row, col);
                             }
