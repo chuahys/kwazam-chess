@@ -7,10 +7,9 @@ import javax.swing.*;
  */
 public class GameController {
     private Game game; // Model
-    private Board board;
     private BoardView boardView; // View
-    private int selectedRow = -1; // Row of selected piece (-1 --> no selection)
-    private int selectedCol = -1; // Column of selected piece (-1 --> no selection)
+    private int selectRow = -1; // Row of selected piece (-1 --> no selection)
+    private int selectCol = -1; // Column of selected piece (-1 --> no selection)
     private final Map<String, MenuCommand> commands = new HashMap<>(); // Map of menu commands to handle menu actions
 
     /**
@@ -21,7 +20,11 @@ public class GameController {
         this.boardView = boardView;
         addBoardListener(); // Add listeners for board interactions
         addMenuListener(); // Add listeners for menu interactions
-        initCommand(); // Initialize the menu commands
+        // Initializes menu commands to specific actions
+        commands.put("Restart", new RestartCommand(boardView));
+        commands.put("Save", new SaveCommand(boardView));
+        commands.put("Load", new LoadCommand(boardView));
+        commands.put("Exit", new ExitCommand());
     }
     
     /**
@@ -46,26 +49,26 @@ public class GameController {
         JMenu menu = boardView.getMenuBar().getMenu(0);
 
         // Get individual menu items
-        JMenuItem restartItem = menu.getItem(0);
-        JMenuItem saveItem = menu.getItem(1);
-        JMenuItem loadItem = menu.getItem(2);
-        JMenuItem exitItem = menu.getItem(3);
+        JMenuItem restart = menu.getItem(0);
+        JMenuItem save = menu.getItem(1);
+        JMenuItem load = menu.getItem(2);
+        JMenuItem exit = menu.getItem(3);
 
         // Add action listeners to these items
-        restartItem.addActionListener(e -> restartGame());
-        saveItem.addActionListener(e -> saveGame());
-        loadItem.addActionListener(e -> loadGame());
-        exitItem.addActionListener(e -> exitGame());
+        restart.addActionListener(e -> restartGame());
+        save.addActionListener(e -> saveGame());
+        load.addActionListener(e -> loadGame());
+        exit.addActionListener(e -> exitGame());
     }
 
     /**
-     * Handles clicks on the board's buttons (pieces).
+     * Handle click on the board's buttons (pieces).
      */
     private void handleButtonClick(int row, int col) {
         // Clear highlights before any action
         boardView.clearHighlight();
 
-        if (selectedRow == -1 && selectedCol == -1) {
+        if (selectRow == -1 && selectCol == -1) {
             // First click: select a piece
             selectPiece(row, col); // Handle piece selection
         } else {
@@ -75,13 +78,13 @@ public class GameController {
     }
     
     /**
-     * Selects a piece and highlights its valid moves.
+     * Select a piece and call the view to highlight valid moves.
      */
     private void selectPiece(int row, int col) {
         Piece piece = game.getBoard().getPieceAt(row, col);
         if (piece != null && piece.getColor() == game.getCurrentPlayer()) {
-            selectedRow = row;
-            selectedCol = col;
+            selectRow = row;
+            selectCol = col;
             boardView.updateMessage(piece.getClass().getSimpleName() + " is selected.");
             // Get valid moves for the selected piece
             List<int[]> validMoves = game.getValidMoves(row, col);
@@ -96,13 +99,13 @@ public class GameController {
      * Attempt to move the selected piece.
      */
     private void toMove(int row, int col) {
-        if (game.movePiece(selectedRow, selectedCol, row, col)) {
+        if (game.movePiece(selectRow, selectCol, row, col)) {
             // Check if the game has a winner (Sau captured)
             PieceColor winner = game.checkWinner();
             if (winner != null) {
                 // If a winner is detected
                 boardView.refreshBoard(); // Update the board view
-                boardView.showWinnerMessage(winner);
+                boardView.showWinner(winner);
                 // Restart the game after Sau captured
                 game.resetGame(); // Reset the game 
                 boardView.setBoardFlip(false); // Reset the board flip state
@@ -120,50 +123,40 @@ public class GameController {
             boardView.updateMessage("Invalid move. Try again.");
         }
         // Reset selection
-        selectedRow = -1;
-        selectedCol = -1;
-    }
-        
-    /**
-     * Initializes menu commands and maps them to specific actions.
-     */
-    private void initCommand() {
-        commands.put("Restart", new RestartCommand(boardView));
-        commands.put("Save", new SaveCommand(boardView));
-        commands.put("Load", new LoadCommand(boardView));
-        commands.put("Exit", new ExitCommand());
+        selectRow = -1;
+        selectCol = -1;
     }
 
     /**
-     * Executes the Restart command.
+     * Execute the Restart command.
      */
     public void restartGame() {
         executeCommand("Restart");
     }
 
     /**
-     * Executes the Save command.
+     * Execute the Save command.
      */
     public void saveGame() {
         executeCommand("Save");
     }
 
     /**
-     * Executes the Load command.
+     * Execute the Load command.
      */
     public void loadGame() {
         executeCommand("Load");
     }
 
     /**
-     * Executes the Exit command.
+     * Execute the Exit command.
      */
     public void exitGame() {
         executeCommand("Exit");
     }
 
     /**
-     * Executes the command with the given string.
+     * Execute the command with the given string.
      */
     private void executeCommand(String str) {
         MenuCommand cmd = commands.get(str);

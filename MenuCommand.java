@@ -2,6 +2,9 @@ import java.io.*;
 import java.util.*;
 import javax.swing.*;
 
+/**
+ * The MenuCommand class implements the Command design pattern.
+ */
 public interface MenuCommand {
     void execute();
 }
@@ -10,8 +13,8 @@ public interface MenuCommand {
  * RestartCommand class handles the restart action for the menu.
  */
 class RestartCommand implements MenuCommand {
-    private final Game game;
-    private final BoardView boardView;
+    private Game game;
+    private BoardView boardView;
 
     public RestartCommand(BoardView boardView) {
         this.game = Game.getInstance();
@@ -48,32 +51,32 @@ class SaveCommand implements MenuCommand {
     public void execute() {
         try {
             // Ensure the SAVE directory exists
-            File saveDir = new File("SAVE");
+            File save = new File("SAVE");
             // Create the directory if it doesn't exist
-            if (!saveDir.exists()) {
-                saveDir.mkdirs();
+            if (!save.exists()) {
+                save.mkdirs();
             }
 
-            String filename;
+            String name;
 
             while (true) {
-                filename = JOptionPane.showInputDialog(boardView, "Enter the file name:").toLowerCase();
+                name = JOptionPane.showInputDialog(boardView, "Enter the file name:").toLowerCase();
 
-                if (filename == null) {
+                if (name == null) {
                     return;
                 }
 
-                if (filename.trim().isEmpty()) {
+                if (name.trim().isEmpty()) {
                     JOptionPane.showMessageDialog(boardView, "Please enter a valid file name", "Error",
                             JOptionPane.ERROR_MESSAGE);
                     continue;
                 }
 
-                if (!filename.endsWith(".txt")) {
-                    filename += ".txt";
+                if (!name.endsWith(".txt")) {
+                    name += ".txt";
                 }
 
-                File file = new File("SAVE", filename);
+                File file = new File("SAVE", name);
                 if (file.exists()) {
                     int replaceOption = JOptionPane.showConfirmDialog(
                             boardView,
@@ -89,17 +92,17 @@ class SaveCommand implements MenuCommand {
                 }
             }
 
-            try (BufferedWriter writer = new BufferedWriter(new FileWriter(new File("SAVE", filename)))) {
-                writer.write("Game Saved (B-Blue R-Red)");
-                writer.newLine();
-                writer.write("Current player: " + game.getCurrentPlayer());
-                writer.newLine();
-                writer.write("Move count: " + game.getMoveCount());
-                writer.newLine();
+            try (BufferedWriter w = new BufferedWriter(new FileWriter(new File("SAVE", name)))) {
+                w.write("Game Saved (B-Blue R-Red)");
+                w.newLine();
+                w.write("Current player: " + game.getCurrentPlayer());
+                w.newLine();
+                w.write("Move count: " + game.getMoveCount());
+                w.newLine();
 
                 // Save the board flip state
-                writer.write("Board Flip: " + boardView.isBoardFlip());
-                writer.newLine();
+                w.write("Board Flip: " + boardView.isBoardFlip());
+                w.newLine();
 
                 // Loop through the board and save each piece
                 for (int row = 0; row < board.getHeight(); row++) {
@@ -107,29 +110,29 @@ class SaveCommand implements MenuCommand {
                         Piece piece = board.getPieceAt(row, col);
 
                         if (piece != null) {
-                            String playerColor = piece.getColor() == PieceColor.RED ? "R" : "B";
+                            String color = piece.getColor() == PieceColor.RED ? "R" : "B";
                             String pieceType = piece.getPieceType().toString();
 
                             // Save piece data along with its direction for Ram pieces
                             if (piece instanceof Ram) {
                                 Ram ram = (Ram) piece;
-                                String direction = ram.getDirection(); // Get the direction up or down
-                                writer.write(playerColor + pieceType + "," + direction); // Save Ram's direction
+                                String dir = ram.getDirection(); // Get the direction up or down
+                                w.write(color + pieceType + "," + dir); // Save Ram's direction
                             } else {
-                                writer.write(playerColor + pieceType);
+                                w.write(color + pieceType);
                             }
                         } else {
-                            writer.write("NULL");
+                            w.write("NULL");
                         }
 
                         if (col < board.getWidth() - 1) {
-                            writer.write(" ");
+                            w.write(" ");
                         }
                     }
-                    writer.newLine();
+                    w.newLine();
                 }
 
-                JOptionPane.showMessageDialog(boardView, "Game saved to: " + filename);
+                JOptionPane.showMessageDialog(boardView, "Game saved to: " + name);
             } catch (IOException ex) {
                 ex.printStackTrace();
                 JOptionPane.showMessageDialog(boardView, "Error saving the game.", "Error", JOptionPane.ERROR_MESSAGE);
@@ -162,89 +165,88 @@ class LoadCommand implements MenuCommand {
     public void execute() {
         try {
             // Check if the SAVE directory exists
-            File saveDirectory = new File("SAVE");
+            File save = new File("SAVE");
 
-            if (!saveDirectory.exists() || !saveDirectory.isDirectory()) {
+            if (!save.exists() || !save.isDirectory()) {
                 JOptionPane.showMessageDialog(boardView, "No saved games found", "Error", JOptionPane.ERROR_MESSAGE);
                 return;
             }
 
             // Let user choose the save file
-            JFileChooser fileChooser = new JFileChooser(saveDirectory);
-            int option = fileChooser.showOpenDialog(boardView);
+            JFileChooser fc = new JFileChooser(save);
+            int option = fc.showOpenDialog(boardView);
 
             if (option == JFileChooser.APPROVE_OPTION) {
-                File file = fileChooser.getSelectedFile();
+                File file = fc.getSelectedFile();
 
                 // Reset the board to clear old game state before loading new one
                 board.resetBoard();
 
-                try (Scanner scanner = new Scanner(file)) {
+                try (Scanner sc = new Scanner(file)) {
                     // Read the header line for validation
-                    if (!scanner.nextLine().equals("Game Saved (B-Blue R-Red)")) {
+                    if (!sc.nextLine().equals("Game Saved (B-Blue R-Red)")) {
                         throw new IOException("Invalid save file format");
                     }
 
                     // Load the current player and move count
-                    String currentPlayerString = scanner.nextLine().split(": ")[1].trim();
-                    PieceColor currentPlayer = PieceColor.valueOf(currentPlayerString.toUpperCase());
+                    String playerStr = sc.nextLine().split(": ")[1].trim();
+                    PieceColor currentPlayer = PieceColor.valueOf(playerStr.toUpperCase());
                     game.setCurrentPlayer(currentPlayer);
 
                     // Load the move count
-                    String moveCountString = scanner.nextLine().split(": ")[1].trim();
-                    int moveCount = Integer.parseInt(moveCountString);
+                    String countStr = sc.nextLine().split(": ")[1].trim();
+                    int moveCount = Integer.parseInt(countStr);
                     game.setMoveCount(moveCount);
 
                     // Load the board flip state
-                    String flipStateLine = scanner.nextLine();
-                    boolean isBoardFlipped = flipStateLine.split(": ")[1].equalsIgnoreCase("true");
-                    boardView.setBoardFlip(isBoardFlipped);
+                    String flipStr = sc.nextLine();
+                    boolean bool = flipStr.split(": ")[1].equalsIgnoreCase("true");
+                    boardView.setBoardFlip(bool);
 
                     // Load the board state
                     for (int row = 0; row < board.getHeight(); row++) {
-                        String line = scanner.nextLine();
+                        String line = sc.nextLine();
                         String[] pieces = line.split(" "); // Split by space
 
                         for (int col = 0; col < board.getWidth(); col++) {
-                            String pieceInfo = pieces[col];
+                            String info = pieces[col];
                          
-                            if (pieceInfo.equals("NULL")) {
+                            if (info.equals("NULL")) {
                                 continue; // No piece at this position
                             }
 
-                            // Split the pieceInfo to extract color and type
-                            String[] pieceData = pieceInfo.split(",");
+                            // Split the info to extract color and type
+                            String[] data = info.split(",");
 
-                            char colorCode = pieceData[0].charAt(0); // Extract the color
-                            String pieceTypeStr = pieceData[0].substring(1); // Extract the piece type
-                            String direction = pieceData.length > 1 ? pieceData[1] : null; // If there is a direction, it will be the second part
+                            char ch = data[0].charAt(0); // Extract the color
+                            String type = data[0].substring(1); // Extract the piece type
+                            String dir = data.length > 1 ? data[1] : null; // If there is a direction, it will be the second part
 
-                            PieceColor color = (colorCode == 'r' || colorCode == 'R') ? PieceColor.RED
-                                    : (colorCode == 'b' || colorCode == 'B') ? PieceColor.BLUE :null;
+                            PieceColor color = (ch == 'r' || ch == 'R') ? PieceColor.RED
+                                    : (ch == 'b' || ch == 'B') ? PieceColor.BLUE :null;
 
                             if (color == null) {
-                                throw new IOException("Invalid piece color code: " + colorCode);
+                                throw new IOException("Invalid piece color code: " + ch);
                             }
 
                             PieceType pieceType;
                             try {
-                                pieceType = PieceType.valueOf(pieceTypeStr.toUpperCase());
+                                pieceType = PieceType.valueOf(type.toUpperCase());
                             } catch (IllegalArgumentException e) {
-                                throw new IOException("Invalid piece type: " + pieceTypeStr);
+                                throw new IOException("Invalid piece type: " + type);
                             }
 
                             // Create and place the piece on the board
-                            Piece loadedPiece = PieceFactory.createPiece(pieceType, color, row, col);
+                            Piece piece = PieceFactory.createPiece(pieceType, color, row, col);
                             // If the piece is a Ram, load the direction too
-                            if (loadedPiece instanceof Ram) {
-                                ((Ram) loadedPiece).setDirection(direction); // Set the direction of the Ram piece
+                            if (piece instanceof Ram) {
+                                ((Ram) piece).setDirection(dir); // Set the direction of the Ram piece
                             }
                             // Place the piece on the board
-                            board.setPieceAt(loadedPiece, row, col);
+                            board.setPieceAt(piece, row, col);
                             
                         }
                     }
-
                     // Update the view
                     boardView.refreshBoard();
                     JOptionPane.showMessageDialog(boardView, "Game loaded successfully!", "Info",
@@ -269,11 +271,11 @@ class ExitCommand implements MenuCommand {
     @Override
     public void execute() {
         // Show a confirmation dialog before exiting
-        int response = JOptionPane.showConfirmDialog(null, "Are you sure you want to exit?", 
+        int option = JOptionPane.showConfirmDialog(null, "Are you sure you want to exit?", 
                                                      "Exit Confirmation", JOptionPane.YES_NO_OPTION);
 
         // If the user confirms, exit the application
-        if (response == JOptionPane.YES_OPTION) {
+        if (option == JOptionPane.YES_OPTION) {
             System.exit(0);
         }
         // If the user chooses "No", do nothing and return to the game

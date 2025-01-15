@@ -112,14 +112,14 @@ public class Game {
      * Attempt to move a piece from current position to new position.
      * @author Chuah Yun Shan
      */
-    public boolean movePiece(int startRow, int startCol, int endRow, int endCol) {
-        Piece piece = board.getPieceAt(startRow, startCol);
+    public boolean movePiece(int startX, int startY, int endX, int endY) {
+        Piece piece = board.getPieceAt(startX, startY);
 
         // Check if the piece exists and if the move is valid
-        if (piece != null && piece.isValidMove(board, startRow, startCol, endRow, endCol)) {
-            board.setPieceAt(piece, endRow, endCol); // Move the piece to the new position
-            board.setPieceAt(null, startRow, startCol); // Clear the old position
-            piece.setPosition(endRow, endCol); // Update the piece's internal position
+        if (piece != null && piece.isValidMove(board, startX, startY, endX, endY)) {
+            board.setPieceAt(piece, endX, endY); // Move the piece to the new position
+            board.setPieceAt(null, startX, startY); // Clear the old position
+            piece.setPosition(endX, endY); // Update the piece's internal position
             switchPlayer(); // Switch the player turn after a valid move
             return true; //  Return true if the move is valid and successful
         }
@@ -149,8 +149,8 @@ public class Game {
      * @author Chuah Yun Shan
      */
      public PieceColor checkWinner() {
-         boolean blueSauCaptured = true;
-         boolean redSauCaptured = true;
+         boolean bSau = true;
+         boolean rSau = true;
 
          // Iterate over all rows and columns of the board
          for (int row = 0; row < board.getHeight(); row++) {
@@ -160,20 +160,20 @@ public class Game {
                  if (piece instanceof Sau) {
                      // If the Sau piece is found, check its color
                      if (piece.getColor() == PieceColor.BLUE) {
-                         blueSauCaptured = false; // Blue's Sau is still on the board
+                         bSau = false; // Blue's Sau is still on the board
                      } else if (piece.getColor() == PieceColor.RED) {
-                         redSauCaptured = false; // Red's Sau is still on the board
+                         rSau = false; // Red's Sau is still on the board
                      }
                  }
              }
          }
          // Return color of the winner
          // If Blue's Sau is captured, Red wins
-         if (blueSauCaptured) {
+         if (bSau) {
              return PieceColor.RED;
          }
          // If Red's Sau is captured, Blue wins
-         if (redSauCaptured) {
+         if (rSau) {
              return PieceColor.BLUE;
          }
          // No winner yet

@@ -51,7 +51,7 @@ public abstract class Piece {
     /**
      * Checks if a move is valid for the piece.
      */
-    public abstract boolean isValidMove(Board board, int startRow, int startCol, int endRow, int endCol);
+    public abstract boolean isValidMove(Board board, int startX, int startY, int endX, int endY);
 
     /**
      * Optional transformation logic (for Tor and Xor pieces only)
@@ -63,16 +63,4 @@ public abstract class Piece {
      * Get the type of the piece.
      */
     public abstract String getPieceType();
-
-    /**
-     * Get the color code for the piece as a string (used for save/load).
-     */
-    public String getColorCode() {
-        if (color == PieceColor.RED) {
-            return "R";
-        } else if (color == PieceColor.BLUE) {
-            return "B";
-        }
-        return "";
-    }
 }
