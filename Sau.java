@@ -7,10 +7,10 @@ public class Sau extends Piece {
     @Override
     public String getImagePath(boolean isFlip) {
         String pieceName = "Sau";
-        String colorName = getColor() == PieceColor.BLUE ? "b" : "r";
+        String colorName = getColor() == PieceColor.BLUE ? "b" : "r"; //determine the piece is red or blue side
 
         if (isFlip) {
-            return "resources/img/" + colorName + pieceName + "_flip.png";
+            return "resources/img/" + colorName + pieceName + "_flip.png"; //flip if sau is on the other side
         } else {
             return "resources/img/" + colorName + pieceName + ".png";
         }
@@ -22,7 +22,8 @@ public class Sau extends Piece {
         if (Math.abs(endRow - startRow) <= 1 && Math.abs(endCol - startCol) <= 1) {
             // Check if the target square is occupied by an ally
             Piece targetPiece = board.getPieceAt(endRow, endCol);
-            return targetPiece == null || targetPiece.getColor() != getColor();
+            return targetPiece == null || targetPiece.getColor() != getColor(); //the move is valid if the target is empty or occupied by an opponent's
+                                                                                // piece
         }
         return false;
     }

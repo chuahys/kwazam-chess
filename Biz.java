@@ -8,7 +8,7 @@ public class Biz extends Piece {
         String pieceName = "Biz";
         String colorName = getColor() == PieceColor.BLUE ? "b" : "r";
 
-        // Biz does not have flipped images
+        // return the img cuz Biz does not have flipped images
         return "resources/img/" + colorName + pieceName + ".png";
     }
 
@@ -18,14 +18,15 @@ public class Biz extends Piece {
         int rowDiff = Math.abs(endRow - startRow);
         int colDiff = Math.abs(endCol - startCol);
 
-        // Must follow the L-shape pattern: (2, 1) or (1, 2)
+        // Must follow the Lshape pattern (2,1) or (1,2)
         boolean isLShape = (rowDiff == 2 && colDiff == 1) || (rowDiff == 1 && colDiff == 2);
         if (!isLShape) {
-            return false;
+            return false; //invalid if not an Lshape move
         }
 
-        // Check if the target position is occupied by the same color
+        // Check if the target position 
         Piece targetPiece = board.getPieceAt(endRow, endCol);
+        // Check if the target position is occupied by an ally piece
         if (targetPiece != null && targetPiece.getColor() == getColor()) {
             return false; // Can't land on a square occupied by an ally
         }
