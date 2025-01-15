@@ -69,8 +69,8 @@ public class BoardView extends JPanel implements BoardObserver {
         createMessagePanel();
     }
 
-/**
-     * Creates and returns a JPanel that displays the player and move count info.
+    /**
+    * Creates and returns a JPanel that displays the player and move count info.
      */
     private JPanel createInfoPanel() {
         JPanel infoPanel = new JPanel();
