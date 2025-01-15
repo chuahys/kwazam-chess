@@ -14,7 +14,7 @@ public class Ram extends Piece {
     }
 
     /**
-     * Returns the image path for the Ram piece, based on the flip state and direction of movement.
+     * Return the image path for the Ram piece, based on the flip state and direction of movement.
      * @author Chuah Yun Shan
      */
     @Override
@@ -59,37 +59,37 @@ public class Ram extends Piece {
     }
     
     /**
-     * Validates if the Ram can make a move to the given position.
+     * Validate if the Ram can make a move to the given position.
      * The Ram can move one square in its current direction (up or down).
      * @author Chuah Yun Shan
      */
     @Override
-    public boolean isValidMove(Board board, int startRow, int startCol, int endRow, int endCol) {
+    public boolean isValidMove(Board board, int startX, int startY, int endX, int endY) {
         // The Ram moves one step forward (vertically)
         if (movingUp) {
             // Move one step upward (decrease row by 1) and stay in the same column
-            if (endRow != startRow - 1 || endCol != startCol) {
+            if (endX != startX - 1 || endY != startY) {
                 return false; // Invalid if not exactly one step upward in the same column
             }
         } else {
             // Move one step downward (increase row by 1) and stay in the same column
-            if (endRow != startRow + 1 || endCol != startCol) {
+            if (endX != startX + 1 || endY != startY) {
                 return false; // Invalid if not exactly one step downward in the same column
             }
         }
 
-        // Check if the target square is empty or occupied by an opponent
-        Piece targetPiece = board.getPieceAt(endRow, endCol);
-        if (targetPiece == null || targetPiece.getColor() != getColor()) {
+        // Check if the target square is empty or occupied by different color piece (opponent)
+        Piece target = board.getPieceAt(endX, endY);
+        if (target == null || target.getColor() != getColor()) {
             return true; // Valid if empty or occupied by an opponent
         }
 
-        return false; // Invalid if occupied by an ally
+        return false; // Invalid if occupied by same color piece
     }
     
     /**
-     * Updates the position of the Ram on the board 
-     * and adjusts the direction of movement (when the Ram reaches the end of the board).
+     * Update the position of the Ram on the board 
+     * and adjust the direction of movement (when the Ram reaches the end of the board).
      * @author Chuah Yun Shan
      */
     @Override
@@ -112,11 +112,29 @@ public class Ram extends Piece {
     }
 
     /**
-     * Returns the type of the Ram piece.
+     * Return the type of the Ram piece.
      * @author Tan Yun Xuan
      */
     @Override
     public String getPieceType() {
         return PieceType.RAM.name(); // Return the name of the PieceType as a String
+    }
+
+     /**
+     * Return the direction of the Ram piece.
+     */
+    public String getDirection() {
+        return movingUp ? "up" : "down"; // Return the current direction
+    }
+
+    /**
+     * Set the direction of the Ram piece.
+     */
+    public void setDirection(String str) {
+        if ("up".equals(str)) {
+            movingUp = true;
+        } else if ("down".equals(str)) {
+            movingUp = false;
+        }
     }
 }

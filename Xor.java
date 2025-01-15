@@ -1,3 +1,10 @@
+/**
+ * Xor class is a subclass of the Piece class.
+ * The Xor moves in a diagonally.
+ * After 2 turns, it will turn into Tor.
+ */
+
+ // Constructor
 public class Xor extends Piece {
     public Xor(PieceColor color, int row, int col) {
         super(color, row, col);
@@ -20,37 +27,39 @@ public class Xor extends Piece {
         }
 
         // Determine direction of movement (diagonal)
-        int rowDirection = Integer.compare(endRow, startRow);
-        int colDirection = Integer.compare(endCol, startCol);
+        int rowDir = Integer.compare(endRow, startRow);
+        int colDir = Integer.compare(endCol, startCol);
 
         // Check all squares in the path to ensure they are empty
-        int currentRow = startRow + rowDirection;
-        int currentCol = startCol + colDirection;
+        int currRow = startRow + rowDir;
+        int currCol = startCol + colDir;
 
-        while (currentRow != endRow || currentCol != endCol) {
-            if (board.getPieceAt(currentRow, currentCol) != null) {
+        while (currRow != endRow || currCol != endCol) {
+            if (board.getPieceAt(currRow, currCol) != null) {
                 return false; // Path is blocked
             }
-            currentRow += rowDirection;
-            currentCol += colDirection;
+            currRow += rowDir;
+            currCol += colDir;
         }
 
         // Check if the target square is occupied by an ally
-        Piece targetPiece = board.getPieceAt(endRow, endCol);
-        return targetPiece == null || targetPiece.getColor() != getColor();
+        Piece tgtPiece = board.getPieceAt(endRow, endCol);
+        return tgtPiece == null || tgtPiece.getColor() != getColor();
     }
 
+
+    // Replace this piece with a Tor piece every two rounds.
     @Override
     public void transform() {
-        // Replace this piece with a Tor piece
-        Tor transformPiece = new Tor(getColor(), getRow(), getCol());
+        Tor transPiece = new Tor(getColor(), getRow(), getCol());
         Board board = Board.getInstance();
-        board.setPieceAt(transformPiece, getRow(), getCol());
+        board.setPieceAt(transPiece, getRow(), getCol());
         System.out.println(this.getColor() + " Xor at (" + getRow() + ", " + getCol() + ") transformed into Tor.");
     }
     
+    // Return the name of the PieceType as a String
     @Override
     public String getPieceType() {
-        return PieceType.XOR.name(); // Return the name of the PieceType as a String
+        return PieceType.XOR.name();
     }
 }

@@ -1,3 +1,9 @@
+/**
+ * Tor class is a subclass of the Piece class.
+ * The Tor moves in a straight line either horizontally or vertically.
+ * After 2 turns, it will turn into Xor.
+ */
+// Constructor
 public class Tor extends Piece {
     public Tor(PieceColor color, int row, int col) {
         super(color, row, col);
@@ -14,44 +20,45 @@ public class Tor extends Piece {
 
     @Override
     public boolean isValidMove(Board board, int startRow, int startCol, int endRow, int endCol) {
-        // Must move orthogonally (either same row or same column)
+        // Must move either same row or same column
         if (startRow != endRow && startCol != endCol) {
             return false;
         }
 
-        // Determine direction of movement
-        int rowDirection = Integer.compare(endRow, startRow); // -1 for up, 1 for down, 0 for no row movement
-        int colDirection = Integer.compare(endCol, startCol); // -1 for left, 1 for right, 0 for no column movement
+        // Determine direction of movement for rows and columns
+        int rowDir = Integer.compare(endRow, startRow); // -1 for up, 1 for down, 0 for no row movement
+        int colDir = Integer.compare(endCol, startCol); // -1 for left, 1 for right, 0 for no column movement
 
-        // Check all squares in the path to ensure they are empty
-        int currentRow = startRow + rowDirection;
-        int currentCol = startCol + colDirection;
+        // Check if the path is clear
+        int currRow = startRow + rowDir;
+        int currCol = startCol + colDir;
 
-        while (currentRow != endRow || currentCol != endCol) {
-            if (board.getPieceAt(currentRow, currentCol) != null) {
+        while (currRow != endRow || currCol != endCol) {
+            if (board.getPieceAt(currRow, currCol) != null) {
                 return false; // Path is blocked
             }
-            currentRow += rowDirection;
-            currentCol += colDirection;
+            currRow += rowDir;
+            currCol += colDir;
         }
 
-        // Check if the target square is occupied by an ally
-        Piece targetPiece = board.getPieceAt(endRow, endCol);
-        return targetPiece == null || targetPiece.getColor() != getColor();
+        // Check if the target square is occupied by an ally or empty
+        Piece tgtPiece = board.getPieceAt(endRow, endCol);
+        return tgtPiece == null || tgtPiece.getColor() != getColor();
     }
 
+    // Replace this piece with an Xor piece every two rounds.
     @Override
     public void transform() {
-        // Replace this piece with an Xor piece
-        Xor transformPiece = new Xor(getColor(), getRow(), getCol());
+        Xor transPiece = new Xor(getColor(), getRow(), getCol());
         Board board = Board.getInstance(); // Assuming Board follows Singleton pattern
-        board.setPieceAt(transformPiece, getRow(), getCol());
+        board.setPieceAt(transPiece, getRow(), getCol());
         System.out.println(this.getColor() + " Tor at (" + getRow() + ", " + getCol() + ") transformed into Xor.");
     }
     
+    // Return the name of the PieceType as a String
     @Override
     public String getPieceType() {
-        return PieceType.TOR.name(); // Return the name of the PieceType as a String
+        return PieceType.TOR.name(); 
     }
     
 }
