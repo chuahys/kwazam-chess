@@ -2,6 +2,7 @@
  * Tor class is a subclass of the Piece class.
  * The Tor moves in a straight line either horizontally or vertically.
  * After 2 turns, it will turn into Xor.
+ * @author Tan Yun Xuan
  */
 // Constructor
 public class Tor extends Piece {
@@ -48,9 +49,8 @@ public class Tor extends Piece {
 
     // Replace this piece with an Xor piece every two rounds.
     @Override
-    public void transform() {
+    public void transform(Board board) {
         Xor transPiece = new Xor(getColor(), getRow(), getCol());
-        Board board = Board.getInstance(); // Assuming Board follows Singleton pattern
         board.setPieceAt(transPiece, getRow(), getCol());
         System.out.println(this.getColor() + " Tor at (" + getRow() + ", " + getCol() + ") transformed into Xor.");
     }
@@ -60,5 +60,4 @@ public class Tor extends Piece {
     public String getPieceType() {
         return PieceType.TOR.name(); 
     }
-    
 }

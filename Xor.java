@@ -2,6 +2,7 @@
  * Xor class is a subclass of the Piece class.
  * The Xor moves in a diagonally.
  * After 2 turns, it will turn into Tor.
+ * @author Tan Yun Xuan
  */
 
  // Constructor
@@ -50,9 +51,8 @@ public class Xor extends Piece {
 
     // Replace this piece with a Tor piece every two rounds.
     @Override
-    public void transform() {
+    public void transform(Board board) {
         Tor transPiece = new Tor(getColor(), getRow(), getCol());
-        Board board = Board.getInstance();
         board.setPieceAt(transPiece, getRow(), getCol());
         System.out.println(this.getColor() + " Xor at (" + getRow() + ", " + getCol() + ") transformed into Tor.");
     }

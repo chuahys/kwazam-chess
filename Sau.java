@@ -1,3 +1,8 @@
+/**
+ * Sau class is a subclass of the Piece class.
+ * It moves one step in any direction.
+ * @author Lee Kar Yen
+ */
 public class Sau extends Piece {
 
     public Sau(PieceColor color, int row, int col) {
@@ -29,7 +34,7 @@ public class Sau extends Piece {
     }
 
     @Override
-    public void transform() {
+    public void transform(Board board) {
         // The Sau does not transform, so no implementation needed here
     }
 

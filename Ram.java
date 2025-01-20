@@ -1,6 +1,7 @@
 /**
  * Ram class is a subclass of the Piece class.
- * The Ram moves one square forward in its current direction (either upwards or downwards).
+ * It moves one step forward in its current direction (upwards or downwards).
+ * @author Chuah Yun Shan
  */
 public class Ram extends Piece {
     private boolean movingUp; // Tracks the current direction of the Ram
@@ -13,6 +14,21 @@ public class Ram extends Piece {
         this.movingUp = true; // Initially moving upward
     }
 
+    /**
+     * Adjust direction when the Ram reaches the end of the board.
+     * @author Chuah Yun Shan
+     */
+    @Override
+    public void setPosition(int row, int col) {
+        super.setPosition(row, col);
+        // Update direction if the Ram reaches the top or bottom of the board
+        if (row == 0) {
+            movingUp = false; // Change direction to downward
+        } else if (row == Game.getInstance().getBoard().getHeight() - 1) {
+            movingUp = true; // Change direction to upward
+        }
+    }
+    
     /**
      * Return the image path for the Ram piece, based on the flip state and direction of movement.
      * @author Chuah Yun Shan
@@ -59,8 +75,7 @@ public class Ram extends Piece {
     }
     
     /**
-     * Validate if the Ram can make a move to the given position.
-     * The Ram can move one square in its current direction (up or down).
+     * Validate if the Ram can make a move.
      * @author Chuah Yun Shan
      */
     @Override
@@ -86,29 +101,13 @@ public class Ram extends Piece {
 
         return false; // Invalid if occupied by same color piece
     }
-    
-    /**
-     * Update the position of the Ram on the board 
-     * and adjust the direction of movement (when the Ram reaches the end of the board).
-     * @author Chuah Yun Shan
-     */
-    @Override
-    public void setPosition(int row, int col) {
-        super.setPosition(row, col);
-        // Update direction if the Ram reaches the top of the board
-        if (row == 0) {
-            movingUp = false; // Change direction to downward
-        } else if (row == Board.getInstance().getHeight() - 1) {
-            movingUp = true; // Change direction to upward
-        }
-    }
 
     /**
      * The Ram does not transform into another piece, so this method is empty.
      */
     @Override
-    public void transform() {
-        // No transformation for Ram, it just moves forward
+    public void transform(Board board) {
+        // No transformation for Ram
     }
 
     /**

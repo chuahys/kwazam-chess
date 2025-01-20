@@ -51,13 +51,13 @@ public abstract class Piece {
     /**
      * Checks if a move is valid for the piece.
      */
-    public abstract boolean isValidMove(Board board, int startX, int startY, int endX, int endY);
+    public abstract boolean isValidMove(Board board, int startRow, int startCol, int endRow, int endCol);
 
     /**
      * Optional transformation logic (for Tor and Xor pieces only)
      * 
      */
-    public abstract void transform();
+    public abstract void transform(Board board);
 
     /**
      * Get the type of the piece.

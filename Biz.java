@@ -1,3 +1,8 @@
+/**
+ * Biz class is a subclass of the Piece class.
+ * It moves in L-shape and can skip over other pieces.
+ * @author Lee Kar Yen
+ */
 public class Biz extends Piece {
     public Biz(PieceColor color, int row, int col) {
         super(color, row, col);
@@ -35,7 +40,7 @@ public class Biz extends Piece {
     }
 
     @Override
-    public void transform() {
+    public void transform(Board board) {
         // No transformation logic for Biz
     }
 
