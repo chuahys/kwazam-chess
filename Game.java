@@ -14,7 +14,7 @@ public class Game {
      * Private constructor for Game.
      */
     private Game() {
-        board = Board.getInstance(); // Get the single instance of Board
+        board = new Board(); // create board
         this.currentPlayer = PieceColor.BLUE; // Start with BLUE player
         moveCount = 0;
         board.setupPieces(); // Initialize pieces for both players
@@ -88,13 +88,11 @@ public class Game {
      */
     public List<int[]> getValidMoves(int row, int col) {
         List<int[]> validMoves = new ArrayList<>();
-
         // Get the piece at the selected position
         Piece piece = board.getPieceAt(row, col);
         if (piece == null || piece.getColor() != currentPlayer) {
             return validMoves; // Return empty list if piece is null or not current player's piece
         }
-
         // Iterate through all possible board positions
         for (int targetRow = 0; targetRow < board.getHeight(); targetRow++) {
             for (int targetCol = 0; targetCol < board.getWidth(); targetCol++) {
@@ -104,7 +102,6 @@ public class Game {
                 }
             }
         }
-
         return validMoves;
     }
 
@@ -112,14 +109,14 @@ public class Game {
      * Attempt to move a piece from current position to new position.
      * @author Chuah Yun Shan
      */
-    public boolean movePiece(int startX, int startY, int endX, int endY) {
-        Piece piece = board.getPieceAt(startX, startY);
+    public boolean movePiece(int startRow, int startCol, int endRow, int endCol) {
+        Piece piece = board.getPieceAt(startRow, startCol);
 
         // Check if the piece exists and if the move is valid
-        if (piece != null && piece.isValidMove(board, startX, startY, endX, endY)) {
-            board.setPieceAt(piece, endX, endY); // Move the piece to the new position
-            board.setPieceAt(null, startX, startY); // Clear the old position
-            piece.setPosition(endX, endY); // Update the piece's internal position
+        if (piece != null && piece.isValidMove(board, startRow, startCol, endRow, endCol)) {
+            board.setPieceAt(piece, endRow, endCol); // Move the piece to the new position
+            board.setPieceAt(null, startRow, startCol); // Clear the old position
+            piece.setPosition(endRow, endCol); // Update the piece's internal position
             switchPlayer(); // Switch the player turn after a valid move
             return true; //  Return true if the move is valid and successful
         }
@@ -136,7 +133,7 @@ public class Game {
                 Piece piece = board.getPieceAt(row, col);
                 // Transform only Tor and Xor pieces
                 if (piece instanceof Tor || piece instanceof Xor) {
-                    piece.transform(); // Call the transform method of the piece
+                    piece.transform(board); // Call the transform method of the piece
                 }
             }
         }

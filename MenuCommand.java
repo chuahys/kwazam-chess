@@ -38,14 +38,14 @@ class RestartCommand implements MenuCommand {
  * @author Chuah Yun Shan
  */
 class SaveCommand implements MenuCommand {
-    private BoardView boardView;
-    private Board board;
     private Game game;
+    private Board board;
+    private BoardView boardView;
 
     public SaveCommand(BoardView boardView) {
-        this.boardView = boardView;
-        this.board = Board.getInstance();
         this.game = Game.getInstance();
+        this.board = game.getBoard();
+        this.boardView = boardView;
     }
 
     @Override
@@ -153,14 +153,14 @@ class SaveCommand implements MenuCommand {
  * @author Chuah Yun Shan
  */
 class LoadCommand implements MenuCommand {
-    private BoardView boardView;
-    private Board board;
     private Game game;
+    private Board board;
+    private BoardView boardView;
 
     public LoadCommand(BoardView boardView) {
+        this.game = Game.getInstance(); // Get the singleton instance of the Game
+        this.board = game.getBoard(); 
         this.boardView = boardView;
-        this.board = Board.getInstance(); // Get the singleton instance of the Board
-        this.game = Game.getInstance();
     }
 
     @Override
@@ -271,10 +271,15 @@ class LoadCommand implements MenuCommand {
  * ExitCommand class handles the exit action for the menu.
  */
 class ExitCommand implements MenuCommand {
+    private BoardView boardView;
+
+    public ExitCommand(BoardView boardView) {
+        this.boardView = boardView;
+    }
     @Override
     public void execute() {
         // Show a confirmation dialog before exiting
-        int option = JOptionPane.showConfirmDialog(null, "Are you sure you want to exit?",
+        int option = JOptionPane.showConfirmDialog(boardView, "Are you sure you want to exit?",
                 "Exit Confirmation", JOptionPane.YES_NO_OPTION);
 
         // If the user confirms, exit the application

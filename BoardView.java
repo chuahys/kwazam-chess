@@ -4,10 +4,9 @@ import javax.swing.*;
 
 /**
  * BoardView class is responsible for displaying the game board.
- * It observes the Board and updates the view accordingly.
  * @author Chuah Yun Shan
  */
-public class BoardView extends JPanel implements BoardObserver {
+public class BoardView extends JFrame implements BoardObserver {
     private Board board;
     private Game game;
     private JButton[][] button;
@@ -17,55 +16,42 @@ public class BoardView extends JPanel implements BoardObserver {
     private boolean isFlip = false;  // Flag to track if the board is flipped
     private int height;
     private int width;
-    private JFrame frame;
-    private JMenuBar menuBar;
 
     /**
-     * Constructor for BoardView. Initializes the JFrame, layout, and components.
+     * Constructor for BoardView.
      */
-    public BoardView(Game game) {
+    public BoardView() {
         this.game = Game.getInstance(); // Get the single instance of Game
-        this.board = this.game.getBoard(); // Get the current board from the game
+        this.board = game.getBoard(); // Get the current board from the game
         this.height = board.getHeight();
         this.width = board.getWidth();
 
-        // Initialize JFrame
-        frame = new JFrame("Kwazam Chess Game");
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setResizable(true); // Enable resizing
-        frame.setSize(500, 800); // Initial frame size
+        // Initialize the frame
+        setTitle("Kwazam Chess Game");
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setResizable(true); // Enable resizing
+        setSize(500, 800); // Set initial size
+        setLocationRelativeTo(null); // Center the window on the screen
 
-        // Set up the menu bar
-        menuBar = createMenuBar();
-        frame.setJMenuBar(menuBar); // Set the menu bar on the JFrame
-
-        // Set up the panel with game content
+        // Set the layout for the frame
         setLayout(new BorderLayout());
-        frame.add(this); // Add the board view (this panel) to the frame
 
-        // Set up the player and move count info
-        JPanel infoPanel = createInfoPanel();
-        add(infoPanel, BorderLayout.NORTH);
+        // Add panels to the frame
+        add(infoPanel(), BorderLayout.NORTH); // Add info panel at the top
+        add(boardPanel(), BorderLayout.CENTER); // Add board panel in the center
+        add(messagePanel(), BorderLayout.SOUTH); // Add message panel at the bottom
 
-        // Set up the chessboard in the center
-        JPanel boardPanel = createBoardPanel();
-        add(boardPanel, BorderLayout.CENTER);
+        // Add menu bar to the frame
+        setJMenuBar(createMenu());
 
-        // Set up the message label at the bottom
-        msgLabel = new JLabel("Welcome to Kwazam Chess!", SwingConstants.CENTER);
-        add(msgLabel, BorderLayout.SOUTH);
-
-        // Set the frame location at the center of the screen
-        frame.setLocationRelativeTo(null); // Center the window
-
-        // Set frame visibility
-        frame.setVisible(true);
+        // Make the frame visible
+        setVisible(true);
     }
 
     /**
-     * Creates and returns a JPanel that displays the player and move count info.
+     * Create panel that displays the player and move count information.
      */
-    private JPanel createInfoPanel() {
+    private JPanel infoPanel() {
         JPanel infoPanel = new JPanel();
         infoPanel.setLayout(new FlowLayout(FlowLayout.RIGHT));
 
@@ -79,9 +65,9 @@ public class BoardView extends JPanel implements BoardObserver {
     }
 
     /**
-     * Create and return a JPanel that represents the chessboard with all the buttons.
+     * Create panel that represents the chessboard with all the buttons.
      */
-    private JPanel createBoardPanel() {
+    private JPanel boardPanel() {
         JPanel boardPanel = new JPanel(new GridLayout(height, width));
         button = new JButton[height][width];
 
@@ -107,9 +93,19 @@ public class BoardView extends JPanel implements BoardObserver {
     }
 
     /**
+     * Create the panel for displaying messages.
+     */
+    private JPanel messagePanel() {
+        JPanel msgPanel = new JPanel(new BorderLayout());
+        msgLabel = new JLabel("Welcome to Kwazam Chess!", SwingConstants.CENTER);
+        msgPanel.add(msgLabel, BorderLayout.CENTER);
+        return msgPanel;
+    }
+
+    /**
      * Create a menu bar with menu items for the game.
      */
-    private JMenuBar createMenuBar() {
+    private JMenuBar createMenu() {
         JMenuBar menuBar = new JMenuBar();
 
         // Create Menu
@@ -131,17 +127,10 @@ public class BoardView extends JPanel implements BoardObserver {
         return menuBar;
     }
 
-    /** 
-     * Return the menu bar to the controller
-     */
-    public JMenuBar getMenuBar() {
-        return menuBar;
-    }
-    
     /**
      * Update the player and move count labels.
      */
-    public void updateLabel() {
+    public void updateInfo() {
         playerLabel.setText("Player: " + game.getCurrentPlayer().toString());
         countLabel.setText("Move Count: " + game.getMoveCount());
     }
@@ -160,7 +149,7 @@ public class BoardView extends JPanel implements BoardObserver {
     // Override from BoardObserver class
     public void refreshBoard() {
         // Update the labels first
-        updateLabel();
+        updateInfo();
 
         // Update the board buttons
         for (int row = 0; row < height; row++) {
@@ -182,10 +171,11 @@ public class BoardView extends JPanel implements BoardObserver {
     /**
      * Highlight valid moves, set the background color to green.
      */
-    public void highlightValidMoves(List<int[]> validMoves) {
-        for (int[] move : validMoves) {
-            int row = move[0];
-            int col = move[1];
+    public void highlight(List<int[]> move) {
+        // Iterate the list of valid moves
+        for (int[] m : move) {
+            int row = m[0]; // Extract the row index
+            int col = m[1]; // Extract the column index
             button[row][col].setBackground(Color.GREEN); // Highlight valid move buttons
         }
     }
@@ -202,31 +192,32 @@ public class BoardView extends JPanel implements BoardObserver {
     }
 
     /**
-     * Sets the board's flip state (whether the board is flipped or not).
+     * Set the board's flip state (whether the board is flipped or not).
      */
     public void setBoardFlip(boolean flip) {
         this.isFlip = flip;
     }
 
     /**
-     * Gets the current flip state of the board.
+     * Get the current flip state of the board.
      */ 
     public boolean isBoardFlip() {
         return isFlip;
     }
 
     /**
-     * Returns the 2D array of buttons representing the board squares.
+     * Return the 2D array of buttons representing the board squares.
      */
     JButton[][] getButton() {
         return button;
     }
 
     /**
-     * Displays a winner message in a dialog box when the game ends.
+     * Display a winner message in a dialog box when the game ends.
      */
     public void showWinner(PieceColor winner) {
         String s = (winner == PieceColor.BLUE) ? "Blue wins! Sau captured!" : "Red wins! Sau captured!";
-        JOptionPane.showMessageDialog(null, s);
+        String title = "Game Over!"; // Title of the dialog
+        JOptionPane.showMessageDialog(null, s, title, JOptionPane.INFORMATION_MESSAGE);
     }
 }

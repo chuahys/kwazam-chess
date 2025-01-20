@@ -24,7 +24,7 @@ public class GameController {
         commands.put("Restart", new RestartCommand(boardView));
         commands.put("Save", new SaveCommand(boardView));
         commands.put("Load", new LoadCommand(boardView));
-        commands.put("Exit", new ExitCommand());
+        commands.put("Exit", new ExitCommand(boardView));
     }
     
     /**
@@ -45,10 +45,13 @@ public class GameController {
      * Add action listeners to the menu items (Restart, Save, Load, Exit).
      */
     private void addMenuListener() {
-        // Get menu items from the view (BoardView)
-        JMenu menu = boardView.getMenuBar().getMenu(0);
+        // Access the menu bar from the BoardView
+        JMenuBar menuBar = boardView.getJMenuBar();  // Get the menu bar from the JFrame
 
-        // Get individual menu items
+        // Access the "Menu"
+        JMenu menu = menuBar.getMenu(0);
+
+        // Get menu items
         JMenuItem restart = menu.getItem(0);
         JMenuItem save = menu.getItem(1);
         JMenuItem load = menu.getItem(2);
@@ -87,9 +90,9 @@ public class GameController {
             selectCol = col;
             boardView.updateMessage(piece.getClass().getSimpleName() + " is selected.");
             // Get valid moves for the selected piece
-            List<int[]> validMoves = game.getValidMoves(row, col);
+            List<int[]> move = game.getValidMoves(row, col);
             // Call to highlight valid moves
-            boardView.highlightValidMoves(validMoves);
+            boardView.highlight(move);
         } else {
             boardView.updateMessage("Invalid selection. Select your own piece.");
         }
