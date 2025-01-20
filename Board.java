@@ -4,28 +4,17 @@ import java.util.*;
  * The Board class represents the game board and manages the pieces on it.
  */
 public class Board {
-    private static Board instance; // The single instance of Board
     private static final int HEIGHT = 8; // fixed rows
     private static final int WIDTH = 5; // fixed columns
     private Piece[][] board; // 2D array for pieces
-    private List<BoardObserver> observer = new ArrayList<>(); // List of observers for the board
+    private List<BoardObserver> observer;
 
     /**
-     * Private constructor for Board.
+     * Constructor for Board.
      */
-    private Board() {
+    public Board() {
         board = new Piece[HEIGHT][WIDTH]; // Initialize an 8x5 board
-    }
-
-    /**
-     * Singleton pattern to ensure only one instance of the Board class.
-     * @author Chuah Yun Shan
-     */
-    public static Board getInstance() {
-        if (instance == null) {
-            instance = new Board(); // Create the instance if it doesn't exist
-        }
-        return instance;
+        observer = new ArrayList<>(); // List of observers for the board
     }
 
     /**
