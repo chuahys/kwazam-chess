@@ -114,12 +114,14 @@ public class BoardView extends JFrame implements BoardObserver {
         JMenuItem save = new JMenuItem("Save");
         JMenuItem load = new JMenuItem("Load");
         JMenuItem exit = new JMenuItem("Exit");
+        JMenuItem info = new JMenuItem("How to Play?");
 
         // Add menu items to the menu
         menu.add(restart);
         menu.add(save);
         menu.add(load);
         menu.add(exit);
+        menu.add(info);
 
         // Add the menu to the menu bar
         menuBar.add(menu);

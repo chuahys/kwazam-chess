@@ -25,6 +25,7 @@ public class GameController {
         commands.put("Save", new SaveCommand(boardView));
         commands.put("Load", new LoadCommand(boardView));
         commands.put("Exit", new ExitCommand(boardView));
+        commands.put("How to Play?", new InfoCommand());
     }
     
     /**
@@ -62,6 +63,7 @@ public class GameController {
         save.addActionListener(e -> saveGame());
         load.addActionListener(e -> loadGame());
         exit.addActionListener(e -> exitGame());
+        exit.addActionListener(e -> infoRule());
     }
 
     /**
@@ -156,6 +158,13 @@ public class GameController {
      */
     public void exitGame() {
         executeCommand("Exit");
+    }
+
+    /**
+     * Execute the Info command (game rule).
+     */
+    public void infoRule() {
+        executeCommand("How to Play?");
     }
 
     /**

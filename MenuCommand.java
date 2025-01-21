@@ -289,3 +289,14 @@ class ExitCommand implements MenuCommand {
         // If the user chooses "No", do nothing and return to the game
     }
 }
+
+/**
+ * ExitCommand class handles the exit action for the menu.
+ */
+class InfoCommand implements MenuCommand {
+
+    @Override
+    public void execute() {
+
+    }
+}
