@@ -57,13 +57,14 @@ public class GameController {
         JMenuItem save = menu.getItem(1);
         JMenuItem load = menu.getItem(2);
         JMenuItem exit = menu.getItem(3);
+        JMenuItem info = menu.getItem(4);
 
         // Add action listeners to these items
         restart.addActionListener(e -> restartGame());
         save.addActionListener(e -> saveGame());
         load.addActionListener(e -> loadGame());
         exit.addActionListener(e -> exitGame());
-        exit.addActionListener(e -> infoRule());
+        info.addActionListener(e -> infoRule());
     }
 
     /**
@@ -161,7 +162,7 @@ public class GameController {
     }
 
     /**
-     * Execute the Info command (game rule).
+     * Execute the Info command (show game rule).
      */
     public void infoRule() {
         executeCommand("How to Play?");

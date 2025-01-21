@@ -291,7 +291,8 @@ class ExitCommand implements MenuCommand {
 }
 
 /**
- * ExitCommand class handles the exit action for the menu.
+ * InfoCommand class shows the pieces' movement rules.
+ * @author Lee Kar Yen
  */
 class InfoCommand implements MenuCommand {
 
