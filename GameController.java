@@ -25,7 +25,7 @@ public class GameController {
         commands.put("Save", new SaveCommand(boardView));
         commands.put("Load", new LoadCommand(boardView));
         commands.put("Exit", new ExitCommand(boardView));
-        commands.put("How to Play?", new InfoCommand());
+        commands.put("How to Play?", new InfoCommand(boardView));
     }
     
     /**

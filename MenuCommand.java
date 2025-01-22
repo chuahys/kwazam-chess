@@ -1,4 +1,5 @@
 import java.io.*;
+import java.lang.ProcessHandle.Info;
 import java.util.*;
 import javax.swing.*;
 
@@ -296,8 +297,39 @@ class ExitCommand implements MenuCommand {
  */
 class InfoCommand implements MenuCommand {
 
+    private BoardView boardView;
+
+    public InfoCommand(BoardView boardView) {
+        this.boardView = boardView;
+    }
+
     @Override
     public void execute() {
+        
+        //text the message for the game information
+        String howToPlay = """
+                Welcome to the game!
 
+                Try to catch the Sau and win the game!
+
+                Game Rule:
+                - Each piece has different movement rules:
+                    * Sau: Moves 1 step in any direction. 
+                    * Ram: Moves 1 step forward; reverses direction at the board's edge.
+                    * Biz: Moves in an L-shape and can jump over pieces.
+                    * Tor: Moves any distance orthogonally. Transforms to Xor after 2 turns.
+                    * Xor: Moves any distance diagonally. Transforms to Tor after 2 turns.
+                - Use strategy to protect your Sau while capturing the opponent's.
+
+                Enjoy the game!
+                """;
+
+
+        //show the info after click button
+        JOptionPane.showMessageDialog(
+                boardView,
+                howToPlay,
+                "How to Play",
+                JOptionPane.INFORMATION_MESSAGE);
     }
 }
